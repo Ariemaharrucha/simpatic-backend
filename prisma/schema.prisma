@@ -1,0 +1,529 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =====================================================
+// 1. USER MANAGEMENT
+// =====================================================
+
+enum UserRole {
+  admin
+  lecturer
+  student
+}
+
+enum UserStatus {
+  active
+  inactive
+  suspended
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  password  String
+  role      UserRole
+  status    UserStatus @default(active)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  admin     Admin?
+  lecturer  Lecturer?
+  student   Student?
+  auditLogs AuditLog[]
+
+  @@map("users")
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique @map("user_id")
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("admins")
+}
+
+model Lecturer {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @unique @map("user_id")
+  lecturerCode String   @unique @map("lecturer_code")
+  name         String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lecturerCourses LecturerCourse[]
+  quizzes         Quiz[]
+  pcesTests       PcesTest[]
+  logbookScores   LogbookScore[]
+  componentScores ComponentScore[]
+  attitudeScores  AttitudeScore[]
+
+  @@map("lecturers")
+}
+
+model Student {
+  id                  Int      @id @default(autoincrement())
+  userId              Int      @unique @map("user_id")
+  nim                 String   @unique
+  name                String
+  preClinicalPassed   Boolean  @default(false) @map("pre_clinical_passed")
+  preClinicalScore    Decimal? @map("pre_clinical_score") @db.Decimal(5, 2)
+  clinicalScore       Decimal? @map("clinical_score") @db.Decimal(5, 2)
+  finalScore          Decimal? @map("final_score") @db.Decimal(5, 2)
+  finalScorePublished Boolean  @default(false) @map("final_score_published")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  classStudents         ClassStudent[]
+  studentStaseSchedules StudentStaseSchedule[]
+  quizSubmissions       QuizSubmission[]
+  pcesTests             PcesTest[]
+  attendances           Attendance[]
+  studentDocuments      StudentDocument[]
+  logbookScores         LogbookScore[]
+  componentScores       ComponentScore[]
+  attitudeScores        AttitudeScore[]
+
+  @@map("students")
+}
+
+// =====================================================
+// 2. MASTER DATA
+// =====================================================
+
+model Hospital {
+  id        Int      @id @default(autoincrement())
+  name      String
+  latitude  Decimal  @db.Decimal(10, 8)
+  longitude Decimal  @db.Decimal(11, 8)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  masterStases          MasterStase[]
+  studentStaseSchedules StudentStaseSchedule[]
+
+  @@map("hospitals")
+}
+
+enum AssessmentComponent {
+  logbook
+  portfolio_seminar
+  dop_exam
+  oslar_responsi
+  case_report
+
+  @@map("assessment_component")
+}
+
+model MasterStase {
+  id                Int      @id @default(autoincrement())
+  name              String
+  defaultHospitalId Int?     @map("default_hospital_id")
+  templateFolder    String   @default("stase-default") @map("template_folder")
+  hasLogbook        Boolean  @default(true) @map("has_logbook")
+  hasPortfolio      Boolean  @default(true) @map("has_portfolio")
+  hasDopExam        Boolean  @default(true) @map("has_dop_exam")
+  hasOslar          Boolean  @default(true) @map("has_oslar")
+  hasCaseReport     Boolean  @default(true) @map("has_case_report")
+  hasAttitude       Boolean  @default(true) @map("has_attitude")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  defaultHospital       Hospital?              @relation(fields: [defaultHospitalId], references: [id])
+  studentStaseSchedules StudentStaseSchedule[]
+
+  @@map("master_stase")
+}
+
+model Course {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  lecturerCourses LecturerCourse[]
+  quizzes         Quiz[]
+
+  @@map("courses")
+}
+
+model Class {
+  id           Int      @id @default(autoincrement())
+  name         String
+  academicYear String   @map("academic_year")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  classStudents ClassStudent[]
+  quizzes       Quiz[]
+
+  @@map("classes")
+}
+
+// =====================================================
+// 3. MAPPING/PLOTTING
+// =====================================================
+
+model LecturerCourse {
+  id         Int      @id @default(autoincrement())
+  lecturerId Int      @map("lecturer_id")
+  courseId   Int      @map("course_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  lecturer Lecturer @relation(fields: [lecturerId], references: [id], onDelete: Cascade)
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([lecturerId, courseId])
+  @@map("lecturer_courses")
+}
+
+model ClassStudent {
+  id        Int      @id @default(autoincrement())
+  classId   Int      @map("class_id")
+  studentId Int      @map("student_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  class   Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, studentId])
+  @@map("class_students")
+}
+
+enum StaseStatus {
+  scheduled
+  active
+  completed
+
+  @@map("stase_status")
+}
+
+model StudentStaseSchedule {
+  id         Int         @id @default(autoincrement())
+  studentId  Int         @map("student_id")
+  staseId    Int         @map("stase_id")
+  hospitalId Int         @map("hospital_id")
+  startDate  DateTime    @map("start_date") @db.Date
+  endDate    DateTime    @map("end_date") @db.Date
+  status     StaseStatus @default(scheduled)
+  totalScore Decimal?    @map("total_score") @db.Decimal(5, 2)
+  isGraded   Boolean     @default(false) @map("is_graded")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+
+  student          Student           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  stase            MasterStase       @relation(fields: [staseId], references: [id], onDelete: Cascade)
+  hospital         Hospital          @relation(fields: [hospitalId], references: [id])
+  attendances      Attendance[]
+  studentDocuments StudentDocument[]
+  logbookScores    LogbookScore[]
+  componentScores  ComponentScore[]
+  attitudeScores   AttitudeScore[]
+
+  @@map("student_stase_schedules")
+}
+
+// =====================================================
+// 4. PRA KLINIK - QUIZ/UJIAN HARIAN
+// =====================================================
+
+enum QuestionType {
+  multiple_choice
+  essay
+
+  @@map("question_type")
+}
+
+model Quiz {
+  id          Int      @id @default(autoincrement())
+  courseId    Int      @map("course_id")
+  classId     Int      @map("class_id")
+  lecturerId  Int      @map("lecturer_id")
+  title       String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  course          Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  class           Class            @relation(fields: [classId], references: [id], onDelete: Cascade)
+  lecturer        Lecturer         @relation(fields: [lecturerId], references: [id], onDelete: Cascade)
+  quizQuestions   QuizQuestion[]
+  quizSubmissions QuizSubmission[]
+
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id            Int          @id @default(autoincrement())
+  quizId        Int          @map("quiz_id")
+  questionType  QuestionType @map("question_type")
+  questionText  String       @map("question_text")
+  optionA       String?      @map("option_a")
+  optionB       String?      @map("option_b")
+  optionC       String?      @map("option_c")
+  optionD       String?      @map("option_d")
+  correctAnswer String?      @map("correct_answer")
+  points        Decimal      @default(1) @db.Decimal(5, 2)
+  orderNumber   Int?         @map("order_number")
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizAnswers QuizAnswer[]
+
+  @@map("quiz_questions")
+}
+
+model QuizSubmission {
+  id          Int      @id @default(autoincrement())
+  quizId      Int      @map("quiz_id")
+  studentId   Int      @map("student_id")
+  submittedAt DateTime @default(now()) @map("submitted_at")
+  score       Decimal? @db.Decimal(5, 2)
+  isGraded    Boolean  @default(false) @map("is_graded")
+
+  quiz        Quiz         @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  student     Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  quizAnswers QuizAnswer[]
+
+  @@unique([quizId, studentId])
+  @@map("quiz_submissions")
+}
+
+model QuizAnswer {
+  id           Int      @id @default(autoincrement())
+  submissionId Int      @map("submission_id")
+  questionId   Int      @map("question_id")
+  answerText   String?  @map("answer_text")
+  isCorrect    Boolean? @map("is_correct")
+  pointsEarned Decimal? @map("points_earned") @db.Decimal(5, 2)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  submission QuizSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  question   QuizQuestion   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("quiz_answers")
+}
+
+// =====================================================
+// 5. PRA KLINIK - PCES (TES PRAKTIKUM)
+// =====================================================
+
+model PcesTestTemplate {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  pcesSopItems PcesSopItem[]
+  pcesTests    PcesTest[]
+
+  @@map("pces_test_templates")
+}
+
+model PcesSopItem {
+  id             Int      @id @default(autoincrement())
+  templateId     Int      @map("template_id")
+  sopDescription String   @map("sop_description")
+  orderNumber    Int      @map("order_number")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  template   PcesTestTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  pcesScores PcesScore[]
+
+  @@map("pces_sop_items")
+}
+
+model PcesTest {
+  id         Int      @id @default(autoincrement())
+  templateId Int      @map("template_id")
+  studentId  Int      @map("student_id")
+  lecturerId Int      @map("lecturer_id")
+  testDate   DateTime @map("test_date") @db.Date
+  totalScore Decimal? @map("total_score") @db.Decimal(5, 2)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  template   PcesTestTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  student    Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  lecturer   Lecturer         @relation(fields: [lecturerId], references: [id], onDelete: Cascade)
+  pcesScores PcesScore[]
+
+  @@map("pces_tests")
+}
+
+model PcesScore {
+  id        Int      @id @default(autoincrement())
+  testId    Int      @map("test_id")
+  sopItemId Int      @map("sop_item_id")
+  score     Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  test    PcesTest    @relation(fields: [testId], references: [id], onDelete: Cascade)
+  sopItem PcesSopItem @relation(fields: [sopItemId], references: [id], onDelete: Cascade)
+
+  @@map("pces_scores")
+}
+
+// =====================================================
+// 6. KLINIK - ABSENSI
+// =====================================================
+
+enum AttendanceStatus {
+  present
+  absent
+  late
+  excused
+
+  @@map("attendance_status")
+}
+
+model Attendance {
+  id              Int              @id @default(autoincrement())
+  studentId       Int              @map("student_id")
+  staseScheduleId Int              @map("stase_schedule_id")
+  attendanceDate  DateTime         @map("attendance_date") @db.Date
+  attendanceTime  DateTime         @map("attendance_time") @db.Time
+  latitude        Decimal          @db.Decimal(10, 8)
+  longitude       Decimal          @db.Decimal(11, 8)
+  status          AttendanceStatus @default(present)
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  student       Student              @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  staseSchedule StudentStaseSchedule @relation(fields: [staseScheduleId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, staseScheduleId, attendanceDate])
+  @@map("attendances")
+}
+
+// =====================================================
+// 7. KLINIK - UPLOAD LOGBOOK & LAPORAN
+// =====================================================
+
+enum DocumentType {
+  logbook
+  portfolio_seminar
+  case_report
+
+  @@map("document_type")
+}
+
+model StudentDocument {
+  id              Int          @id @default(autoincrement())
+  studentId       Int          @map("student_id")
+  staseScheduleId Int          @map("stase_schedule_id")
+  documentType    DocumentType @map("document_type")
+  weekNumber      Int?         @map("week_number")
+  driveLink       String       @map("drive_link")
+  uploadDate      DateTime     @default(now()) @map("upload_date")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  student       Student              @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  staseSchedule StudentStaseSchedule @relation(fields: [staseScheduleId], references: [id], onDelete: Cascade)
+
+  @@map("student_documents")
+}
+
+// =====================================================
+// 8. KLINIK - PENILAIAN
+// =====================================================
+
+model LogbookScore {
+  id              Int      @id @default(autoincrement())
+  studentId       Int      @map("student_id")
+  staseScheduleId Int      @map("stase_schedule_id")
+  weekNumber      Int      @map("week_number")
+  gradedBy        Int      @map("graded_by")
+  score           Decimal  @db.Decimal(5, 2)
+  feedback        String?
+  pdfUrl          String?  @map("pdf_url")
+  gradedDate      DateTime @default(now()) @map("graded_date")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  student       Student              @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  staseSchedule StudentStaseSchedule @relation(fields: [staseScheduleId], references: [id], onDelete: Cascade)
+  lecturer      Lecturer             @relation(fields: [gradedBy], references: [id], onDelete: Cascade)
+
+  @@unique([staseScheduleId, weekNumber])
+  @@map("logbook_scores")
+}
+
+model ComponentScore {
+  id              Int                 @id @default(autoincrement())
+  studentId       Int                 @map("student_id")
+  staseScheduleId Int                 @map("stase_schedule_id")
+  component       AssessmentComponent
+  gradedBy        Int                 @map("graded_by")
+  score           Decimal             @db.Decimal(5, 2)
+  feedback        String?
+  pdfUrl          String?             @map("pdf_url")
+  gradedDate      DateTime            @default(now()) @map("graded_date")
+  updatedAt       DateTime            @updatedAt @map("updated_at")
+
+  student       Student              @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  staseSchedule StudentStaseSchedule @relation(fields: [staseScheduleId], references: [id], onDelete: Cascade)
+  lecturer      Lecturer             @relation(fields: [gradedBy], references: [id], onDelete: Cascade)
+
+  @@unique([staseScheduleId, component])
+  @@map("component_scores")
+}
+
+enum AttitudeCategory {
+  A
+  B
+  C
+
+  @@map("attitude_category")
+}
+
+model AttitudeScore {
+  id              Int              @id @default(autoincrement())
+  studentId       Int              @map("student_id")
+  staseScheduleId Int              @map("stase_schedule_id")
+  gradedBy        Int              @map("graded_by")
+  sikapCategory   AttitudeCategory @map("sikap_category")
+  sikapScore      Decimal          @map("sikap_score") @db.Decimal(5, 2)
+  attitudeNotes   String?          @map("attitude_notes")
+  gradedDate      DateTime         @default(now()) @map("graded_date")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  student       Student              @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  staseSchedule StudentStaseSchedule @relation(fields: [staseScheduleId], references: [id], onDelete: Cascade)
+  lecturer      Lecturer             @relation(fields: [gradedBy], references: [id], onDelete: Cascade)
+
+  @@unique([staseScheduleId])
+  @@map("attitude_scores")
+}
+
+// =====================================================
+// 9. AUDIT LOG
+// =====================================================
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  action    String
+  tableName String   @map("table_name")
+  recordId  Int      @map("record_id")
+  oldData   Json?    @map("old_data")
+  newData   Json?    @map("new_data")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
