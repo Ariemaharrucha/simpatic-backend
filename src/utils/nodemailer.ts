@@ -79,11 +79,15 @@ export const sendAccountCredentialsEmail = async ({
             padding: 20px;
             margin: 20px 0;
             border-radius: 5px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
           }
           .credential-row {
             display: flex;
             margin-bottom: 10px;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
           }
           .credential-label {
             font-weight: 600;
@@ -97,6 +101,10 @@ export const sendAccountCredentialsEmail = async ({
             padding: 5px 10px;
             border-radius: 4px;
             font-size: 14px;
+            word-break: break-all;
+            overflow-wrap: anywhere;
+            max-width: 100%;
+            box-sizing: border-box;
           }
           .warning-box {
             background-color: #fffaf0;
