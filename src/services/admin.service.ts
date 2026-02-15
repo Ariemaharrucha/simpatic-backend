@@ -148,6 +148,10 @@ export const AdminService = {
     };
   },
 
+  // bulk registration endpoints can be added here in the future
+  // register student with file upload (csv, excel) - optional enhancement coming soon
+  // register lecturer with file upload (csv, excel) - optional enhancement coming soon
+
   // Register new admin
   registerAdmin: async (data: { name: string; email: string }) => {
     const emailExists = await UserRepository.isEmailExists(data.email);
