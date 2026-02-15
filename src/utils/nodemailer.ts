@@ -14,17 +14,19 @@ const transporter = nodemailer.createTransport({
 interface AccountCredentialsEmail {
   to: string;
   name: string;
-  identifier: string;
+  email: string;
   password: string;
   role: string;
+  identifier?: string;
 }
 
 export const sendAccountCredentialsEmail = async ({
   to,
   name,
-  identifier,
+  email,
   password,
   role,
+  identifier,
 }: AccountCredentialsEmail): Promise<void> => {
   const mailOptions = {
     from: `"SIMPATIC System" <${process.env.GMAIL_USER}>`,
@@ -148,35 +150,50 @@ export const sendAccountCredentialsEmail = async ({
             <h1>Selamat Datang di SIMPATIC</h1>
             <p style="margin: 10px 0 0 0; opacity: 0.9;">Sistem Informasi Manajemen Penilaian dan Evaluasi Klinik</p>
           </div>
-          
+
           <div class="content">
             <div class="greeting">
               Halo <strong>${name}</strong>,
             </div>
-            
+
             <p>Akun Anda sebagai <strong>${role}</strong> telah berhasil dibuat di sistem SIMPATIC. Berikut adalah informasi login Anda:</p>
-            
+
             <div class="info-box">
               <div class="credential-row">
                 <span class="credential-label">Role:</span>
                 <span class="credential-value">${role}</span>
               </div>
+
               <div class="credential-row">
-                <span class="credential-label">${role === "Mahasiswa" ? "NIM" : role === "Dosen" ? "Kode Dosen" : "Email"}:</span>
+                <span class="credential-label">Email:</span>
+                <span class="credential-value">${email}</span>
+              </div>
+
+              ${
+                identifier
+                  ? `
+              <div class="credential-row">
+                <span class="credential-label">
+                  ${role === "Mahasiswa" ? "NIM" : role === "Dosen" ? "Kode Dosen" : ""}
+                </span>
                 <span class="credential-value">${identifier}</span>
               </div>
+              `
+                  : ""
+              }
+
               <div class="credential-row">
                 <span class="credential-label">Password:</span>
                 <span class="credential-value">${password}</span>
               </div>
             </div>
-            
+
             <div style="text-align: center;">
               <a href="${process.env.FRONTEND_URL || "http://localhost:3000"}/login" class="button">
                 Login ke SIMPATIC
               </a>
             </div>
-            
+
             <div class="warning-box">
               <div class="warning-title">⚠️ Penting!</div>
               <div class="warning-text">
@@ -187,12 +204,12 @@ export const sendAccountCredentialsEmail = async ({
                 </ul>
               </div>
             </div>
-            
+
             <p style="margin-top: 25px; font-size: 14px; color: #4a5568;">
               Jika Anda memiliki pertanyaan atau mengalami kendala, silakan hubungi administrator.
             </p>
           </div>
-          
+
           <div class="footer">
             <p style="margin: 0;">Email ini dikirim secara otomatis oleh SIMPATIC System</p>
             <p style="margin: 5px 0 0 0;">© 2026 SIMPATIC. All rights reserved.</p>
