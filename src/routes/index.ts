@@ -1,6 +1,9 @@
 import { Router } from "express";
 import authRoutes from "./auth.routes";
 import adminRoutes from "./admin.routes";
+import classesRoutes from "./admin/classes.routes";
+import { authenticate } from "../middleware/auth.middleware";
+import { authorize } from "../middleware/role.middleware";
 
 const router = Router();
 
@@ -9,6 +12,7 @@ router.use("/auth", authRoutes);
 
 // Admin routes (admin only)
 router.use("/admin", adminRoutes);
+router.use("/admin/classes", authenticate, authorize("admin"), classesRoutes);
 
 // TODO: Add other routes here
 // router.use("/lecturer", authenticate, authorize("lecturer"), lecturerRoutes);
