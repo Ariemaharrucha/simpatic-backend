@@ -54,11 +54,7 @@ export const AuthController = {
   },
 
   // Change password
-  handleChangePassword: async (
-    req: AuthRequest,
-    res: Response,
-    next: NextFunction,
-  ) => {
+  handleChangePassword: async ( req: AuthRequest, res: Response, next: NextFunction ) => {
     try {
       const userId = req.user?.userId;
       const { oldPassword, newPassword } = req.body;

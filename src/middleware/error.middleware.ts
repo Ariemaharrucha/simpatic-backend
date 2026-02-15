@@ -30,6 +30,13 @@ export class NotFoundError extends Error {
   }
 }
 
+export class EmailError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "EmailError";
+  }
+}
+
 // Global error handler
 export const errorHandler = (
   err: Error,
@@ -53,6 +60,10 @@ export const errorHandler = (
 
   if (err instanceof NotFoundError) {
     return ResponseUtils.error(res, err.message, 404);
+  }
+
+  if (err instanceof EmailError) {
+    return ResponseUtils.error(res, err.message, 502);
   }
 
   return ResponseUtils.internalError(

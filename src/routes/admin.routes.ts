@@ -20,4 +20,7 @@ router.get("/users/lecturers", AdminController.getAllLecturers);
 router.post("/users/admins", AdminController.handleRegisterAdmin);
 router.get("/users/admins", AdminController.getAllAdmins);
 
+// Resend credentials
+router.post("/users/:userId/resend-credentials", AdminController.handleResendCredentials);
+
 export default router;

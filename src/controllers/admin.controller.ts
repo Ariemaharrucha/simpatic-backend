@@ -22,12 +22,11 @@ export const AdminController = {
         email,
       });
 
-      return ResponseUtils.success(
-        res,
-        result,
-        "Student registered successfully. Credentials sent to email.",
-        201,
-      );
+      const message = result.credentials.emailSent
+        ? "Student registered successfully. Credentials sent to email."
+        : "Student registered but email failed. Credentials shown in response.";
+
+      return ResponseUtils.success(res, result, message, 201);
     } catch (error) {
       next(error);
     }
@@ -53,12 +52,11 @@ export const AdminController = {
         email,
       });
 
-      return ResponseUtils.success(
-        res,
-        result,
-        "Lecturer registered successfully. Credentials sent to email.",
-        201,
-      );
+      const message = result.credentials.emailSent
+        ? "Lecturer registered successfully. Credentials sent to email."
+        : "Lecturer registered but email failed. Credentials shown in response.";
+
+      return ResponseUtils.success(res, result, message, 201);
     } catch (error) {
       next(error);
     }
@@ -78,12 +76,11 @@ export const AdminController = {
         email,
       });
 
-      return ResponseUtils.success(
-        res,
-        result,
-        "Admin registered successfully. Credentials sent to email.",
-        201,
-      );
+      const message = result.credentials.emailSent
+        ? "Admin registered successfully. Credentials sent to email."
+        : "Admin registered but email failed. Credentials shown in response.";
+
+      return ResponseUtils.success(res, result, message, 201);
     } catch (error) {
       next(error);
     }
@@ -138,6 +135,28 @@ export const AdminController = {
         result,
         "Admins retrieved successfully",
       );
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // Resend credentials to user
+  handleResendCredentials: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userIdParam = req.params.userId as string;
+      const userId = parseInt(userIdParam);
+
+      if (isNaN(userId)) {
+        return ResponseUtils.error(res, "Valid userId is required", 400);
+      }
+
+      const result = await AdminService.resendCredentials(userId);
+
+      const message = result.credentials.emailSent
+        ? "New credentials sent to email successfully."
+        : "Email failed. New credentials shown in response.";
+
+      return ResponseUtils.success(res, result, message);
     } catch (error) {
       next(error);
     }
