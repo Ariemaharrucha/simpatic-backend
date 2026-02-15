@@ -181,4 +181,8 @@ export const CourseService = {
 
     return await CourseRepository.getAvailableLecturers(courseId, page, limit);
   },
+
+  // BULK OPERATIONS - Coming Soon
+  // TODO: bulkAssignLecturers
+  // TODO: bulkRemoveLecturers
 };
