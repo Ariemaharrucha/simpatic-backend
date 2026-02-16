@@ -33,6 +33,7 @@ export interface IJWTPayload {
   userId: number;
   email: string;
   role: string;
+  profileId: number;
 }
 
 // Change password request

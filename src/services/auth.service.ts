@@ -34,6 +34,7 @@ export const AuthService = {
       userId: user.id,
       email: user.email,
       role: user.role,
+      profileId: user.admin?.id || user.lecturer?.id || user.student?.id || 0,
     };
 
     const token = JwtUtils.generateToken(payload);
