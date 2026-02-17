@@ -265,6 +265,7 @@ model Quiz {
   lecturerId  Int      @map("lecturer_id")
   title       String
   description String?
+  quizType    QuestionType @map("quiz_type")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
@@ -280,7 +281,6 @@ model Quiz {
 model QuizQuestion {
   id            Int          @id @default(autoincrement())
   quizId        Int          @map("quiz_id")
-  questionType  QuestionType @map("question_type")
   questionText  String       @map("question_text")
   optionA       String?      @map("option_a")
   optionB       String?      @map("option_b")
