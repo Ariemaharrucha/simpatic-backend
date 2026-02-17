@@ -75,6 +75,14 @@ export const UserRepository = {
     return !!lecturer;
   },
 
+  // Check if student exists by ID
+  studentExists: async (studentId: number): Promise<boolean> => {
+    const student = await prisma.student.findUnique({
+      where: { id: studentId },
+    });
+    return !!student;
+  },
+
   // Create student with user (transaction)
   createStudent: async (data: {
     email: string;
