@@ -157,6 +157,11 @@ export const QuizService = {
     const result = await QuizRepository.findByLecturer(lecturerId, page, limit);
 
     const quizzes: IQuizResponse[] = result.quizzes.map((quiz: any) => {
+      const totalPoints = quiz.quizQuestions?.reduce(
+        (sum: number, q: any) => sum + (q.points as Prisma.Decimal).toNumber(),
+        0
+      ) ?? 0;
+
       return {
         id: quiz.id,
         title: quiz.title,
@@ -165,7 +170,7 @@ export const QuizService = {
         course: quiz.course,
         class: quiz.class,
         questionCount: quiz._count?.quizQuestions ?? 0,
-        totalPoints: 0,
+        totalPoints,
         createdAt: quiz.createdAt,
       };
     });
@@ -191,20 +196,27 @@ export const QuizService = {
     const classId = classWithStudents.classId;
     const quizzes = await QuizRepository.findAvailableForStudent(classId, studentId);
 
-    const response: IQuizResponse[] = quizzes.map((quiz: any) => ({
-      id: quiz.id,
-      title: quiz.title,
-      description: quiz.description ?? undefined,
-      quizType: quiz.quizType,
-      course: quiz.course,
-      class: {
-        id: classWithStudents.classId,
-        name: classWithStudents.class.name,
-      },
-      questionCount: quiz._count?.quizQuestions ?? 0,
-      totalPoints: 0,
-      createdAt: quiz.createdAt,
-    }));
+    const response: IQuizResponse[] = quizzes.map((quiz: any) => {
+      const totalPoints = quiz.quizQuestions?.reduce(
+        (sum: number, q: any) => sum + (q.points as Prisma.Decimal).toNumber(),
+        0
+      ) ?? 0;
+
+      return {
+        id: quiz.id,
+        title: quiz.title,
+        description: quiz.description ?? undefined,
+        quizType: quiz.quizType,
+        course: quiz.course,
+        class: {
+          id: classWithStudents.classId,
+          name: classWithStudents.class.name,
+        },
+        questionCount: quiz._count?.quizQuestions ?? 0,
+        totalPoints,
+        createdAt: quiz.createdAt,
+      };
+    });
 
     return { quizzes: response, total: response.length };
   },

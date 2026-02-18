@@ -92,6 +92,12 @@ export const QuizRepository = {
               name: true,
             },
           },
+          quizQuestions: {
+            select: {
+              id: true,
+              points: true,
+            },
+          },
           _count: {
             select: {
               quizQuestions: true,
@@ -126,6 +132,12 @@ export const QuizRepository = {
             id: true,
             code: true,
             name: true,
+          },
+        },
+        quizQuestions: {
+          select: {
+            id: true,
+            points: true,
           },
         },
         _count: {
