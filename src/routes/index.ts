@@ -4,6 +4,7 @@ import adminRoutes from "./admin.routes";
 import classesRoutes from "./admin/classes.routes";
 import coursesRoutes from "./admin/courses.routes";
 import quizRoutes from "./pra-klinik/quiz.routes";
+import pcesRoutes from "./pra-klinik/pces.routes";
 import { authenticate } from "../middleware/auth.middleware";
 import { authorize } from "../middleware/role.middleware";
 
@@ -19,6 +20,7 @@ router.use("/admin/courses", authenticate, authorize("admin"), coursesRoutes);
 
 // Pra Klinik routes (lecturer and student)
 router.use("/pra-klinik/quizzes", authenticate, quizRoutes);
+router.use("/pra-klinik/pces", authenticate, pcesRoutes);
 
 // TODO: Add other routes here
 // router.use("/lecturer", authenticate, authorize("lecturer"), lecturerRoutes);
