@@ -11,20 +11,24 @@ const COOKIE_OPTIONS = {
 };
 
 export const AuthController = {
-  // Login untuk semua user (admin, lecturer, student) menggunakan email
+  // Login untuk semua user (admin, lecturer, student)
+  // Admin: email, Lecturer: NIK, Student: NIM
   handleLogin: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, password } = req.body;
+      const { identifier, email, password } = req.body;
 
-      if (!email || !password) {
+      // Support both 'identifier' and 'email' for backward compatibility
+      const loginIdentifier = identifier || email;
+
+      if (!loginIdentifier || !password) {
         return ResponseUtils.error(
           res,
-          "Email and password are required",
+          "Identifier and password are required",
           400,
         );
       }
 
-      const result = await AuthService.login(email, password);
+      const result = await AuthService.login(loginIdentifier, password);
 
       res.cookie("token", result.token, COOKIE_OPTIONS);
 

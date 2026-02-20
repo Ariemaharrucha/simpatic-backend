@@ -43,6 +43,16 @@ export const UserRepository = {
     });
   },
 
+  // login dosen by lecturer code (NIK)
+  findLecturerByCode: async (lecturerCode: string) => {
+    return await prisma.lecturer.findUnique({
+      where: { lecturerCode },
+      include: {
+        user: true,
+      },
+    });
+  },
+
   // update password
   updatePassword: async (userId: number, newPassword: string) => {
     return await prisma.user.update({

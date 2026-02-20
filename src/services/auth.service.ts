@@ -2,19 +2,42 @@ import { UserRepository } from "../repositories/user.repository";
 import { PasswordUtils } from "../utils/password.utils";
 import { JwtUtils } from "../utils/jwt.utils";
 import { IAuthResponse, IJWTPayload, IUserResponse } from "../types/auth.types";
-import {
-  ForbiddenError,
-  NotFoundError,
-  UnauthorizedError,
-} from "../middleware/error.middleware";
+import { ForbiddenError, NotFoundError, UnauthorizedError } from "../middleware/error.middleware";
 
 export const AuthService = {
-  // Login for all user (admin, lecturer, student) using email
-  login: async (email: string, password: string): Promise<IAuthResponse> => {
-    const user = await UserRepository.findByEmail(email);
+
+  login: async (identifier: string, password: string): Promise<IAuthResponse> => {
+    let user: any = null;
+
+    // Check if identifier is email (contains '@') - Admin only
+    if (identifier.includes("@")) {
+      // Admin login with email only
+      const emailUser = await UserRepository.findByEmail(identifier);
+      if (emailUser && emailUser.role === "admin") {
+        user = emailUser;
+      }
+    } else {
+      // Non-email identifier: Try student login with NIM first
+      const student = await UserRepository.findStudentByNIM(identifier);
+      if (student) {
+        user = {
+          ...student.user,
+          student: student,
+        };
+      } else {
+        // Try lecturer login with NIK (lecturerCode)
+        const lecturer = await UserRepository.findLecturerByCode(identifier);
+        if (lecturer) {
+          user = {
+            ...lecturer.user,
+            lecturer: lecturer,
+          };
+        }
+      }
+    }
 
     if (!user) {
-      throw new NotFoundError("User not found");
+      throw new UnauthorizedError("Invalid credentials");
     }
 
     if (user.status !== "active") {
@@ -27,7 +50,7 @@ export const AuthService = {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedError("Invalid password");
+      throw new UnauthorizedError("Invalid credentials");
     }
 
     const payload: IJWTPayload = {
@@ -58,7 +81,7 @@ export const AuthService = {
         nim: user.student.nim,
       };
     } else {
-      throw new UnauthorizedError("Invalid user profile");
+      throw new UnauthorizedError("Invalid credentials");
     }
 
     return {

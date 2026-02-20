@@ -1,14 +1,18 @@
-import { IUserWithProfile } from "./user.types";
-
-// Login request untuk Admin & Dosen
+// Unified login request - identifier can be email (admin), NIM (student), or NIK (lecturer)
 export interface ILoginRequest {
-  email: string;
+  identifier: string;
   password: string;
 }
 
 // Login request untuk Mahasiswa
 export interface IStudentLoginRequest {
   nim: string;
+  password: string;
+}
+
+// Login request untuk Dosen
+export interface ILecturerLoginRequest {
+  nik: string;
   password: string;
 }
 
