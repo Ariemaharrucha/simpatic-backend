@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { PcesService } from "../../services/pces.service";
 import { ResponseUtils } from "../../utils/response.utils";
 import { AuthRequest } from "../../middleware/auth.middleware";
+import { ValidationError } from "../../middleware/error.middleware";
 
 export const PcesController = {
   handleCreateTemplate: async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -20,7 +21,8 @@ export const PcesController = {
 
   handleGetAllTemplates: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const templates = await PcesService.getAllTemplates();
+      const courseId = req.query.courseId ? parseInt(req.query.courseId as string) : undefined;
+      const templates = await PcesService.getAllTemplates(courseId);
       return ResponseUtils.success(res, { templates }, "Templates retrieved successfully");
     } catch (error) {
       next(error);
@@ -37,6 +39,73 @@ export const PcesController = {
     }
   },
 
+  handleGetLecturerCourses: async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const lecturerId = req.user?.profileId;
+      if (!lecturerId) {
+        return ResponseUtils.unauthorized(res);
+      }
+
+      const courses = await PcesService.getLecturerCourses(lecturerId);
+      return ResponseUtils.success(res, { courses }, "Courses retrieved successfully");
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  handleGetLecturerTemplates: async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const lecturerId = req.user?.profileId;
+      if (!lecturerId) {
+        return ResponseUtils.unauthorized(res);
+      }
+
+      const courseId = req.query.courseId ? parseInt(req.query.courseId as string) : undefined;
+      const templates = await PcesService.getLecturerTemplates(lecturerId, courseId);
+      return ResponseUtils.success(res, { templates }, "Templates retrieved successfully");
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  handleGetLecturerClasses: async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const lecturerId = req.user?.profileId;
+      if (!lecturerId) {
+        return ResponseUtils.unauthorized(res);
+      }
+
+      const courseId = parseInt(req.query.courseId as string);
+      if (!courseId) {
+        throw new ValidationError("courseId is required");
+      }
+
+      const classes = await PcesService.getLecturerClasses(lecturerId, courseId);
+      return ResponseUtils.success(res, { classes }, "Classes retrieved successfully");
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  handleGetLecturerStudents: async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const lecturerId = req.user?.profileId;
+      if (!lecturerId) {
+        return ResponseUtils.unauthorized(res);
+      }
+
+      const classId = parseInt(req.query.classId as string);
+      if (!classId) {
+        throw new ValidationError("classId is required");
+      }
+
+      const students = await PcesService.getLecturerStudents(lecturerId, classId);
+      return ResponseUtils.success(res, { students }, "Students retrieved successfully");
+    } catch (error) {
+      next(error);
+    }
+  },
+
   handleCreatePcesTest: async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const lecturerId = req.user?.profileId;
@@ -46,6 +115,21 @@ export const PcesController = {
 
       const test = await PcesService.createPcesTest(req.body, lecturerId);
       return ResponseUtils.success(res, { test }, "PCES test created successfully", 201);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  handleUpdatePcesTest: async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const lecturerId = req.user?.profileId;
+      if (!lecturerId) {
+        return ResponseUtils.unauthorized(res);
+      }
+
+      const testId = parseInt(req.params.id as string);
+      const test = await PcesService.updatePcesTest(testId, req.body, lecturerId);
+      return ResponseUtils.success(res, { test }, "PCES test updated successfully");
     } catch (error) {
       next(error);
     }

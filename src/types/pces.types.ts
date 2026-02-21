@@ -2,6 +2,7 @@ import { Prisma } from "../generated/prisma/client";
 
 export interface IPcesTestTemplate {
   id: number;
+  courseId: number;
   name: string;
   description?: string;
   createdAt: Date;
@@ -19,6 +20,8 @@ export interface IPcesSopItem {
 export interface IPcesTest {
   id: number;
   templateId: number;
+  courseId: number;
+  classId: number;
   studentId: number;
   lecturerId: number;
   testDate: Date;
@@ -36,6 +39,7 @@ export interface IPcesScore {
 }
 
 export interface ICreateTemplateRequest {
+  courseId: number;
   name: string;
   description?: string;
   sopItems: ICreateSopItemRequest[];
@@ -48,6 +52,7 @@ export interface ICreateSopItemRequest {
 
 export interface ICreatePcesTestRequest {
   templateId: number;
+  classId: number;
   studentId: number;
   testDate: string;
   scores: ICreatePcesScoreRequest[];
@@ -62,6 +67,11 @@ export interface IPcesTemplateResponse {
   id: number;
   name: string;
   description?: string;
+  course: {
+    id: number;
+    code: string;
+    name: string;
+  };
   sopItemCount: number;
   createdAt: Date;
 }
@@ -70,6 +80,11 @@ export interface IPcesTemplateDetailResponse {
   id: number;
   name: string;
   description?: string;
+  course: {
+    id: number;
+    code: string;
+    name: string;
+  };
   sopItems: {
     id: number;
     sopDescription: string;
@@ -86,6 +101,16 @@ export interface IPcesTestResponse {
     id: number;
     name: string;
   };
+  course: {
+    id: number;
+    code: string;
+    name: string;
+  };
+  class: {
+    id: number;
+    name: string;
+    academicYear: string;
+  };
   student: {
     id: number;
     nim: string;
@@ -100,6 +125,16 @@ export interface IPcesTestDetailResponse {
   template: {
     id: number;
     name: string;
+  };
+  course: {
+    id: number;
+    code: string;
+    name: string;
+  };
+  class: {
+    id: number;
+    name: string;
+    academicYear: string;
   };
   student: {
     id: number;
@@ -122,4 +157,28 @@ export interface IPcesStudentResultResponse {
     id: number;
     name: string;
   };
+  course: {
+    id: number;
+    code: string;
+    name: string;
+  };
+}
+
+export interface ILecturerCourseResponse {
+  id: number;
+  code: string;
+  name: string;
+}
+
+export interface ILecturerClassResponse {
+  id: number;
+  name: string;
+  academicYear: string;
+  studentCount: number;
+}
+
+export interface ILecturerStudentResponse {
+  id: number;
+  nim: string;
+  name: string;
 }
