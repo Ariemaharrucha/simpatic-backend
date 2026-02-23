@@ -97,4 +97,64 @@ export const AuthController = {
       next(error);
     }
   },
+
+  // Request OTP for password reset
+  handleRequestOTP: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return ResponseUtils.error(res, "Email is required", 400);
+      }
+
+      await AuthService.requestOTP(email);
+      return ResponseUtils.success(
+        res,
+        null,
+        "OTP code has been sent to your email",
+      );
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // Verify OTP
+  handleVerifyOTP: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, otp } = req.body;
+
+      if (!email || !otp) {
+        return ResponseUtils.error(res, "Email and OTP are required", 400);
+      }
+
+      const result = await AuthService.verifyOTP(email, otp);
+      return ResponseUtils.success(
+        res,
+        { resetToken: result.resetToken },
+        "OTP verified successfully",
+      );
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // Reset password
+  handleResetPassword: async ( req: Request, res: Response, next: NextFunction ) => {
+    try {
+      const { email, resetToken, newPassword } = req.body;
+
+      if (!email || !resetToken || !newPassword) {
+        return ResponseUtils.error(
+          res,
+          "Email, reset token, and new password are required",
+          400,
+        );
+      }
+
+      await AuthService.resetPassword(email, resetToken, newPassword);
+      return ResponseUtils.success(res, null, "Password reset successfully");
+    } catch (error) {
+      next(error);
+    }
+  },
 };

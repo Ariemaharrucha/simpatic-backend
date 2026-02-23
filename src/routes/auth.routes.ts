@@ -6,6 +6,9 @@ const router = Router();
 
 // Public routes
 router.post("/login", AuthController.handleLogin);
+router.post("/forgot-password", AuthController.handleRequestOTP);
+router.post("/verify-otp", AuthController.handleVerifyOTP);
+router.post("/reset-password", AuthController.handleResetPassword);
 
 // Protected routes
 router.post("/logout", authenticate, AuthController.handleLogout);
