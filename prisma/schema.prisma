@@ -46,6 +46,7 @@ model User {
   lecturer  Lecturer?
   student   Student?
   auditLogs AuditLog[]
+  passwordResetTokens PasswordResetToken[]
 
   @@map("users")
 }
@@ -60,6 +61,23 @@ model Admin {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("admins")
+}
+
+model PasswordResetToken {
+  id         Int       @id @default(autoincrement())
+  userId     Int       @map("user_id")
+  tokenHash  String    @map("token_hash")
+  email      String
+  attempts   Int       @default(0)
+  expiresAt  DateTime  @map("expires_at")
+  usedAt     DateTime? @map("used_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([userId])
+  @@map("password_reset_tokens")
 }
 
 model Lecturer {
