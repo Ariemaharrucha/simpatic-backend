@@ -135,8 +135,10 @@ model Hospital {
   name      String
   latitude  Decimal  @db.Decimal(10, 8)
   longitude Decimal  @db.Decimal(11, 8)
+  radius    Int      @default(150)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   masterStases          MasterStase[]
   studentStaseSchedules StudentStaseSchedule[]
@@ -167,6 +169,7 @@ model MasterStase {
   hasAttitude       Boolean  @default(true) @map("has_attitude")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
+  deletedAt         DateTime? @map("deleted_at")
 
   defaultHospital       Hospital?              @relation(fields: [defaultHospitalId], references: [id])
   studentStaseSchedules StudentStaseSchedule[]
