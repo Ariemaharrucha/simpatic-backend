@@ -30,6 +30,13 @@ export class NotFoundError extends Error {
   }
 }
 
+export class BadRequestError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "BadRequestError";
+  }
+}
+
 export class EmailError extends Error {
   constructor(message: string) {
     super(message);
@@ -60,6 +67,10 @@ export const errorHandler = (
 
   if (err instanceof NotFoundError) {
     return ResponseUtils.error(res, err.message, 404);
+  }
+
+  if (err instanceof BadRequestError) {
+    return ResponseUtils.error(res, err.message, 400);
   }
 
   if (err instanceof EmailError) {

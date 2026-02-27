@@ -1,4 +1,5 @@
 import { ClassRepository } from "../repositories/class.repository";
+import { UserRepository } from "../repositories/user.repository";
 import { 
   IClass, 
   ICreateClassRequest, 
@@ -108,6 +109,12 @@ export const ClassService = {
   // Assign student to class
   assignStudent: async (classId: number, data: IAssignStudentRequest): Promise<any> => {
     const { studentId } = data;
+
+    // Check if student exists
+    const studentExists = await UserRepository.studentExists(studentId);
+    if (!studentExists) {
+      throw new NotFoundError("Student not found");
+    }
 
     // Check if class exists and is active
     const classData = await ClassRepository.findById(classId);

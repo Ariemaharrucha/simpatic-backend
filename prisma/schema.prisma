@@ -46,6 +46,7 @@ model User {
   lecturer  Lecturer?
   student   Student?
   auditLogs AuditLog[]
+  passwordResetTokens PasswordResetToken[]
 
   @@map("users")
 }
@@ -60,6 +61,23 @@ model Admin {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("admins")
+}
+
+model PasswordResetToken {
+  id         Int       @id @default(autoincrement())
+  userId     Int       @map("user_id")
+  tokenHash  String    @map("token_hash")
+  email      String
+  attempts   Int       @default(0)
+  expiresAt  DateTime  @map("expires_at")
+  usedAt     DateTime? @map("used_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([userId])
+  @@map("password_reset_tokens")
 }
 
 model Lecturer {
@@ -164,8 +182,11 @@ model Course {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
+
   lecturerCourses LecturerCourse[]
   quizzes         Quiz[]
+  PcesTestTemplate PcesTestTemplate[]
+  pcesTests         PcesTest[]
 
   @@map("courses")
 }
@@ -178,8 +199,10 @@ model Class {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
   deletedAt    DateTime? @map("deleted_at")
+
   classStudents ClassStudent[]
   quizzes       Quiz[]
+  pcesTests     PcesTest[]
 
   @@map("classes")
 }
@@ -265,6 +288,7 @@ model Quiz {
   lecturerId  Int      @map("lecturer_id")
   title       String
   description String?
+  quizType    QuestionType @map("quiz_type")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
@@ -280,7 +304,6 @@ model Quiz {
 model QuizQuestion {
   id            Int          @id @default(autoincrement())
   quizId        Int          @map("quiz_id")
-  questionType  QuestionType @map("question_type")
   questionText  String       @map("question_text")
   optionA       String?      @map("option_a")
   optionB       String?      @map("option_b")
@@ -334,11 +357,13 @@ model QuizAnswer {
 
 model PcesTestTemplate {
   id          Int      @id @default(autoincrement())
+  courseId    Int      @map("course_id")
   name        String
   description String?
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
+  course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   pcesSopItems PcesSopItem[]
   pcesTests    PcesTest[]
 
@@ -361,6 +386,8 @@ model PcesSopItem {
 model PcesTest {
   id         Int      @id @default(autoincrement())
   templateId Int      @map("template_id")
+  courseId   Int      @map("course_id")
+  classId    Int      @map("class_id")
   studentId  Int      @map("student_id")
   lecturerId Int      @map("lecturer_id")
   testDate   DateTime @map("test_date") @db.Date
@@ -369,10 +396,13 @@ model PcesTest {
   updatedAt  DateTime @updatedAt @map("updated_at")
 
   template   PcesTestTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  course     Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  class      Class            @relation(fields: [classId], references: [id], onDelete: Cascade)
   student    Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
   lecturer   Lecturer         @relation(fields: [lecturerId], references: [id], onDelete: Cascade)
   pcesScores PcesScore[]
 
+  @@unique([templateId, studentId])
   @@map("pces_tests")
 }
 

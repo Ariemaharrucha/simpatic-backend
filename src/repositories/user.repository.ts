@@ -43,6 +43,16 @@ export const UserRepository = {
     });
   },
 
+  // login dosen by lecturer code (NIK)
+  findLecturerByCode: async (lecturerCode: string) => {
+    return await prisma.lecturer.findUnique({
+      where: { lecturerCode },
+      include: {
+        user: true,
+      },
+    });
+  },
+
   // update password
   updatePassword: async (userId: number, newPassword: string) => {
     return await prisma.user.update({
@@ -73,6 +83,14 @@ export const UserRepository = {
       where: { lecturerCode },
     });
     return !!lecturer;
+  },
+
+  // Check if student exists by ID
+  studentExists: async (studentId: number): Promise<boolean> => {
+    const student = await prisma.student.findUnique({
+      where: { id: studentId },
+    });
+    return !!student;
   },
 
   // Create student with user (transaction)
