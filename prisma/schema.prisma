@@ -23,6 +23,16 @@ enum UserStatus {
   suspended
 }
 
+enum ClassStatus {
+  active
+  inactive
+}
+
+enum CourseStatus {
+  active
+  inactive
+}
+
 model User {
   id        Int        @id @default(autoincrement())
   email     String     @unique
@@ -150,9 +160,10 @@ model Course {
   id        Int      @id @default(autoincrement())
   code      String   @unique
   name      String
+  status    CourseStatus @default(active)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
+  deletedAt DateTime? @map("deleted_at")
   lecturerCourses LecturerCourse[]
   quizzes         Quiz[]
 
@@ -162,10 +173,11 @@ model Course {
 model Class {
   id           Int      @id @default(autoincrement())
   name         String
+  status       ClassStatus @default(active) 
   academicYear String   @map("academic_year")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
-
+  deletedAt    DateTime? @map("deleted_at")
   classStudents ClassStudent[]
   quizzes       Quiz[]
 
