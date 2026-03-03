@@ -4,7 +4,8 @@ import adminRoutes from "./admin.routes";
 import classesRoutes from "./admin/classes.routes";
 import coursesRoutes from "./admin/courses.routes";
 import praKlinikRoutes from "./admin/pra-klinik.routes";
-import masterRoutes from "./admin/master.routes";
+import hospitalRoutes from "./admin/hospital.routes";
+import staseRoutes from "./admin/stase.routes";
 import quizRoutes from "./pra-klinik/quiz.routes";
 import pcesRoutes from "./pra-klinik/pces.routes";
 import { authenticate } from "../middleware/auth.middleware";
@@ -20,7 +21,8 @@ router.use("/admin", adminRoutes);
 router.use("/admin/classes", authenticate, authorize("admin"), classesRoutes);
 router.use("/admin/courses", authenticate, authorize("admin"), coursesRoutes);
 router.use("/admin/pra-klinik", authenticate, authorize("admin"), praKlinikRoutes);
-router.use("/admin", authenticate, authorize("admin"), masterRoutes);
+router.use("/admin/hospitals", authenticate, authorize("admin"), hospitalRoutes);
+router.use("/admin/stases", authenticate, authorize("admin"), staseRoutes);
 
 // Pra Klinik routes (lecturer and student)
 router.use("/pra-klinik/quizzes", authenticate, quizRoutes);

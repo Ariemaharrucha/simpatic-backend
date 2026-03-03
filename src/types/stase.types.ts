@@ -2,6 +2,10 @@ export interface IMasterStaseResponse {
   id: number;
   name: string;
   defaultHospitalId: number | null;
+  defaultHospital: {
+    id: number;
+    name: string;
+  } | null;
   templateFolder: string;
   hasLogbook: boolean;
   hasPortfolio: boolean;

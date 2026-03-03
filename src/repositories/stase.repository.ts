@@ -15,12 +15,18 @@ export const StaseRepository = {
         hasCaseReport: data.hasCaseReport ?? true,
         hasAttitude: data.hasAttitude ?? true,
       },
+      include: {
+        defaultHospital: true,
+      },
     });
   },
 
   findById: async (id: number, includeDeleted: boolean = false) => {
     return await prisma.masterStase.findUnique({
       where: includeDeleted ? { id } : { id, deletedAt: null },
+      include: {
+        defaultHospital: true,
+      },
     });
   },
 
@@ -78,6 +84,9 @@ export const StaseRepository = {
         ...(data.hasCaseReport !== undefined && { hasCaseReport: data.hasCaseReport }),
         ...(data.hasAttitude !== undefined && { hasAttitude: data.hasAttitude }),
       },
+      include: {
+        defaultHospital: true,
+      },
     });
   },
 
@@ -85,6 +94,9 @@ export const StaseRepository = {
     return await prisma.masterStase.update({
       where: { id },
       data: { deletedAt: new Date() },
+      include: {
+        defaultHospital: true,
+      },
     });
   },
 
@@ -92,6 +104,9 @@ export const StaseRepository = {
     return await prisma.masterStase.update({
       where: { id },
       data: { deletedAt: null },
+      include: {
+        defaultHospital: true,
+      },
     });
   },
 
