@@ -1,4 +1,4 @@
-export interface IClass {
+export interface IClassResponse {
   id: number;
   name: string;
   academicYear: string;
@@ -6,6 +6,13 @@ export interface IClass {
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date | null;
+}
+
+export interface IPaginationResponse {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }
 
 export interface ICreateClassRequest {
@@ -18,7 +25,7 @@ export interface IUpdateClassRequest {
   academicYear?: string;
 }
 
-export interface IClassWithStudents extends IClass {
+export interface IClassWithStudents extends IClassResponse {
   classStudents: Array<{
     id: number;
     studentId: number;

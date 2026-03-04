@@ -1,19 +1,20 @@
 import { CourseRepository } from "../repositories/course.repository";
 import {
-  ICourse,
+  ICourseResponse,
   ICreateCourseRequest,
   IUpdateCourseRequest,
   ICourseWithLecturers,
   IAssignLecturerRequest,
   IAvailableLecturer,
   ICourseLecturer,
-  ILecturerWithUser
+  ILecturerWithUser,
+  IPaginationResponse
 } from "../types/course.types";
 import { ValidationError, NotFoundError } from "../middleware/error.middleware";
 
 export const CourseService = {
   // Create new course
-  createCourse: async (data: ICreateCourseRequest): Promise<ICourse> => {
+  createCourse: async (data: ICreateCourseRequest): Promise<ICourseResponse> => {
     if (!data.code || data.code.trim().length === 0) {
       throw new ValidationError("Course code is required");
     }
@@ -34,12 +35,12 @@ export const CourseService = {
     return await CourseRepository.create(data);
   },
 
-  // Get all courses
+// Get all courses
   getAllCourses: async (
     page: number = 1, 
     limit: number = 10,
     includeInactive: boolean = false
-  ): Promise<{ courses: ICourse[]; total: number; page: number; limit: number }> => {
+  ): Promise<{ courses: ICourseResponse[]; pagination: IPaginationResponse }> => {
     return await CourseRepository.findAll(page, limit, includeInactive);
   },
 
@@ -55,7 +56,7 @@ export const CourseService = {
   },
 
   // Update course
-  updateCourse: async (id: number, data: IUpdateCourseRequest): Promise<ICourse> => {
+  updateCourse: async (id: number, data: IUpdateCourseRequest): Promise<ICourseResponse> => {
     const exists = await CourseRepository.exists(id);
     if (!exists) {
       throw new NotFoundError("Course not found");
@@ -83,7 +84,7 @@ export const CourseService = {
   },
 
   // Soft delete course
-  deleteCourse: async (id: number): Promise<ICourse> => {
+  deleteCourse: async (id: number): Promise<ICourseResponse> => {
     const exists = await CourseRepository.exists(id);
     if (!exists) {
       throw new NotFoundError("Course not found");
@@ -93,7 +94,7 @@ export const CourseService = {
   },
 
   // Restore soft deleted course
-  restoreCourse: async (id: number): Promise<ICourse> => {
+  restoreCourse: async (id: number): Promise<ICourseResponse> => {
     const exists = await CourseRepository.exists(id);
     if (!exists) {
       throw new NotFoundError("Course not found");
@@ -158,7 +159,7 @@ export const CourseService = {
     await CourseRepository.removeLecturer(courseId, lecturerId);
   },
 
-  // Get lecturers in course
+// Get lecturers in course
   getLecturers: async (courseId: number): Promise<ICourseLecturer[]> => {
     const exists = await CourseRepository.exists(courseId);
     if (!exists) {
@@ -168,12 +169,12 @@ export const CourseService = {
     return await CourseRepository.getLecturers(courseId);
   },
 
-  // Get available lecturers (not assigned to specific course)
+// Get available lecturers (not assigned to specific course)
   getAvailableLecturers: async (
     courseId: number,
     page: number = 1,
     limit: number = 10
-  ): Promise<{ lecturers: IAvailableLecturer[]; total: number; page: number; limit: number }> => {
+  ): Promise<{ lecturers: IAvailableLecturer[]; pagination: IPaginationResponse }> => {
     const exists = await CourseRepository.exists(courseId);
     if (!exists) {
       throw new NotFoundError("Course not found");

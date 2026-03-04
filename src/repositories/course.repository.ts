@@ -1,9 +1,9 @@
 import prisma from "../utils/prisma";
-import { ICourse, ICreateCourseRequest, IUpdateCourseRequest, ICourseWithLecturers, IAvailableLecturer, ILecturerWithUser } from "../types/course.types";
+import { ICourseResponse, ICreateCourseRequest, IUpdateCourseRequest, ICourseWithLecturers, IAvailableLecturer, ILecturerWithUser, IPaginationResponse } from "../types/course.types";
 
 export const CourseRepository = {
   // Create new course
-  create: async (data: ICreateCourseRequest): Promise<ICourse> => {
+  create: async (data: ICreateCourseRequest): Promise<ICourseResponse> => {
     return await prisma.course.create({
       data: {
         code: data.code,
@@ -13,12 +13,12 @@ export const CourseRepository = {
     });
   },
 
-  // Find all courses with pagination
+// Find all courses with pagination
   findAll: async (
     page: number = 1,
     limit: number = 10,
     includeInactive: boolean = false
-  ): Promise<{ courses: ICourse[]; total: number; page: number; limit: number }> => {
+  ): Promise<{ courses: ICourseResponse[]; pagination: IPaginationResponse }> => {
     const skip = (page - 1) * limit;
     
     const where: any = {};
@@ -40,11 +40,14 @@ export const CourseRepository = {
       prisma.course.count({ where }),
     ]);
 
-    return { courses, total, page, limit };
+    return { 
+      courses, 
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } 
+    };
   },
 
   // Find course by ID (course info only)
-  findById: async (id: number): Promise<ICourse | null> => {
+  findById: async (id: number): Promise<ICourseResponse | null> => {
     return await prisma.course.findUnique({
       where: { id },
     });
@@ -92,7 +95,7 @@ export const CourseRepository = {
   },
 
   // Find course by code
-  findByCode: async (code: string): Promise<ICourse | null> => {
+  findByCode: async (code: string): Promise<ICourseResponse | null> => {
     return await prisma.course.findUnique({
       where: { code },
     });
@@ -115,7 +118,7 @@ export const CourseRepository = {
   },
 
   // Update course
-  update: async (id: number, data: IUpdateCourseRequest): Promise<ICourse> => {
+  update: async (id: number, data: IUpdateCourseRequest): Promise<ICourseResponse> => {
     return await prisma.course.update({
       where: { id },
       data: {
@@ -126,7 +129,7 @@ export const CourseRepository = {
   },
 
   // Soft delete course
-  softDelete: async (id: number): Promise<ICourse> => {
+  softDelete: async (id: number): Promise<ICourseResponse> => {
     return await prisma.course.update({
       where: { id },
       data: {
@@ -137,7 +140,7 @@ export const CourseRepository = {
   },
 
   // Restore soft deleted course
-  restore: async (id: number): Promise<ICourse> => {
+  restore: async (id: number): Promise<ICourseResponse> => {
     return await prisma.course.update({
       where: { id },
       data: {
@@ -225,12 +228,12 @@ export const CourseRepository = {
     return count > 0;
   },
 
-  // Get available lecturers (not assigned to specific course)
+// Get available lecturers (not assigned to specific course)
   getAvailableLecturers: async (
     courseId: number,
     page: number = 1,
     limit: number = 10
-  ): Promise<{ lecturers: IAvailableLecturer[]; total: number; page: number; limit: number }> => {
+  ): Promise<{ lecturers: IAvailableLecturer[]; pagination: IPaginationResponse }> => {
     const skip = (page - 1) * limit;
 
     // Get all lecturer IDs already assigned to this course
@@ -277,6 +280,9 @@ export const CourseRepository = {
       }),
     ]);
 
-    return { lecturers, total, page, limit };
+return { 
+      lecturers, 
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } 
+    };
   },
 };

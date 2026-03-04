@@ -1,9 +1,9 @@
 import prisma from "../utils/prisma";
-import { IClass, ICreateClassRequest, IUpdateClassRequest, IClassWithStudents, IAvailableStudent } from "../types/class.types";
+import { IClassResponse, ICreateClassRequest, IUpdateClassRequest, IClassWithStudents, IAvailableStudent, IPaginationResponse } from "../types/class.types";
 
 export const ClassRepository = {
   // Create new class
-  create: async (data: ICreateClassRequest): Promise<IClass> => {
+  create: async (data: ICreateClassRequest): Promise<IClassResponse> => {
     return await prisma.class.create({
       data: {
         name: data.name,
@@ -13,13 +13,13 @@ export const ClassRepository = {
     });
   },
 
-  // Find all classes with pagination
+// Find all classes with pagination
   findAll: async (
     page: number = 1,
     limit: number = 10,
     academicYear?: string,
     includeInactive: boolean = false
-  ): Promise<{ classes: IClass[]; total: number; page: number; limit: number }> => {
+  ): Promise<{ classes: IClassResponse[]; pagination: IPaginationResponse }> => {
     const skip = (page - 1) * limit;
     
     const where: any = {};
@@ -45,17 +45,20 @@ export const ClassRepository = {
       prisma.class.count({ where }),
     ]);
 
-    return { classes, total, page, limit };
+    return { 
+      classes, 
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } 
+    };
   },
 
   // Find class by ID (class info only)
-  findById: async (id: number): Promise<IClass | null> => {
+  findById: async (id: number): Promise<IClassResponse | null> => {
     return await prisma.class.findUnique({
       where: { id },
     });
   },
 
-  // Find class with students
+// Find class with students
   findByIdWithStudents: async (id: number): Promise<IClassWithStudents | null> => {
     // Get class info
     const classInfo = await prisma.class.findUnique({
@@ -92,7 +95,7 @@ export const ClassRepository = {
   },
 
   // Find class by academic year
-  findByAcademicYear: async (academicYear: string): Promise<IClass[]> => {
+  findByAcademicYear: async (academicYear: string): Promise<IClassResponse[]> => {
     return await prisma.class.findMany({
       where: {
         academicYear,
@@ -109,7 +112,7 @@ export const ClassRepository = {
   findByNameAndAcademicYear: async (
     name: string,
     academicYear: string
-  ): Promise<IClass | null> => {
+  ): Promise<IClassResponse | null> => {
     return await prisma.class.findFirst({
       where: {
         name,
@@ -119,7 +122,7 @@ export const ClassRepository = {
   },
 
   // Update class
-  update: async (id: number, data: IUpdateClassRequest): Promise<IClass> => {
+  update: async (id: number, data: IUpdateClassRequest): Promise<IClassResponse> => {
     return await prisma.class.update({
       where: { id },
       data: {
@@ -130,7 +133,7 @@ export const ClassRepository = {
   },
 
   // Soft delete class
-  softDelete: async (id: number): Promise<IClass> => {
+  softDelete: async (id: number): Promise<IClassResponse> => {
     return await prisma.class.update({
       where: { id },
       data: {
@@ -141,7 +144,7 @@ export const ClassRepository = {
   },
 
   // Restore soft deleted class
-  restore: async (id: number): Promise<IClass> => {
+  restore: async (id: number): Promise<IClassResponse> => {
     return await prisma.class.update({
       where: { id },
       data: {
@@ -231,12 +234,12 @@ export const ClassRepository = {
     });
   },
 
-  // Get available students (not assigned to any class in academic year)
+// Get available students (not assigned to any class in academic year)
   getAvailableStudents: async (
     academicYear: string,
     page: number = 1,
     limit: number = 10
-  ): Promise<{ students: IAvailableStudent[]; total: number; page: number; limit: number }> => {
+  ): Promise<{ students: IAvailableStudent[]; pagination: IPaginationResponse }> => {
     const skip = (page - 1) * limit;
 
     // Get all student IDs already assigned to classes in this academic year
@@ -285,7 +288,10 @@ export const ClassRepository = {
       }),
     ]);
 
-    return { students, total, page, limit };
+    return { 
+      students, 
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } 
+    };
   },
 
   // Check if student is assigned to specific class

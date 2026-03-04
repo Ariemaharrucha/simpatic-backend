@@ -1,4 +1,4 @@
-export interface ICourse {
+export interface ICourseResponse {
   id: number;
   code: string;
   name: string;
@@ -6,6 +6,13 @@ export interface ICourse {
   createdAt: Date;
   updatedAt: Date;
   deletedAt?: Date | null;
+}
+
+export interface IPaginationResponse {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }
 
 export interface ICreateCourseRequest {
@@ -18,7 +25,7 @@ export interface IUpdateCourseRequest {
   name?: string;
 }
 
-export interface ICourseWithLecturers extends ICourse {
+export interface ICourseWithLecturers extends ICourseResponse {
   lecturerCourses: Array<{
     id: number;
     lecturerId: number;

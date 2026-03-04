@@ -1,18 +1,19 @@
 import { ClassRepository } from "../repositories/class.repository";
 import { UserRepository } from "../repositories/user.repository";
 import { 
-  IClass, 
+  IClassResponse, 
   ICreateClassRequest, 
   IUpdateClassRequest, 
   IClassWithStudents,
   IAssignStudentRequest,
-  IAvailableStudent 
+  IAvailableStudent,
+  IPaginationResponse
 } from "../types/class.types";
 import { ValidationError, NotFoundError } from "../middleware/error.middleware";
 
 export const ClassService = {
   // Create new class
-  createClass: async (data: ICreateClassRequest): Promise<IClass> => {
+  createClass: async (data: ICreateClassRequest): Promise<IClassResponse> => {
     // Validate academic year format (2025/2026)
     const academicYearPattern = /^\d{4}\/\d{4}$/;
     if (!academicYearPattern.test(data.academicYear)) {
@@ -39,13 +40,13 @@ export const ClassService = {
     return await ClassRepository.create(data);
   },
 
-  // Get all classes
+// Get all classes
   getAllClasses: async (
     page: number = 1, 
     limit: number = 10,
     academicYear?: string,
     includeInactive: boolean = false
-  ): Promise<{ classes: IClass[]; total: number; page: number; limit: number }> => {
+  ): Promise<{ classes: IClassResponse[]; pagination: IPaginationResponse }> => {
     return await ClassRepository.findAll(page, limit, academicYear, includeInactive);
   },
 
@@ -61,7 +62,7 @@ export const ClassService = {
   },
 
   // Update class
-  updateClass: async (id: number, data: IUpdateClassRequest): Promise<IClass> => {
+  updateClass: async (id: number, data: IUpdateClassRequest): Promise<IClassResponse> => {
     // Check if class exists
     const exists = await ClassRepository.exists(id);
     if (!exists) {
@@ -85,7 +86,7 @@ export const ClassService = {
   },
 
   // Soft delete class
-  deleteClass: async (id: number): Promise<IClass> => {
+  deleteClass: async (id: number): Promise<IClassResponse> => {
     // Check if class exists
     const exists = await ClassRepository.exists(id);
     if (!exists) {
@@ -96,7 +97,7 @@ export const ClassService = {
   },
 
   // Restore soft deleted class
-  restoreClass: async (id: number): Promise<IClass> => {
+  restoreClass: async (id: number): Promise<IClassResponse> => {
     // Check if class exists
     const exists = await ClassRepository.exists(id);
     if (!exists) {
@@ -177,12 +178,12 @@ export const ClassService = {
     return await ClassRepository.getStudents(classId);
   },
 
-  // Get available students (not assigned to any class in academic year)
+// Get available students (not assigned to any class in academic year)
   getAvailableStudents: async (
     academicYear: string,
     page: number = 1,
     limit: number = 10
-  ): Promise<{ students: IAvailableStudent[]; total: number; page: number; limit: number }> => {
+  ): Promise<{ students: IAvailableStudent[]; pagination: IPaginationResponse }> => {
     // Validate academic year format
     const academicYearPattern = /^\d{4}\/\d{4}$/;
     if (!academicYearPattern.test(academicYear)) {
