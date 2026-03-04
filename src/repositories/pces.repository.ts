@@ -1,9 +1,9 @@
 import prisma from "../utils/prisma";
 import { Prisma } from "../generated/prisma/client";
-import { ICreateTemplateRequest, ICreatePcesTestRequest } from "../types/pces.types";
+import { ICreateTemplate, ICreatePcesTest } from "../types/pces.types";
 
 export const PcesRepository = {
-  createTemplate: async (data: ICreateTemplateRequest) => {
+  createTemplate: async (data: ICreateTemplate) => {
     return await prisma.$transaction(async (tx) => {
       const template = await tx.pcesTestTemplate.create({
         data: {
@@ -120,8 +120,8 @@ export const PcesRepository = {
     });
   },
 
-  createPcesTest: async (
-    data: ICreatePcesTestRequest & { lecturerId: number; courseId: number; totalScore: number }
+createPcesTest: async (
+    data: ICreatePcesTest & { lecturerId: number; courseId: number; totalScore: number }
   ) => {
     return await prisma.$transaction(async (tx) => {
       const test = await tx.pcesTest.create({

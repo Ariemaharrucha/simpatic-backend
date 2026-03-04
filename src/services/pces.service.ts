@@ -5,8 +5,8 @@ import { ClassRepository } from "../repositories/class.repository";
 import { NotFoundError, ValidationError, ForbiddenError } from "../middleware/error.middleware";
 import { Prisma } from "../generated/prisma/client";
 import {
-  ICreateTemplateRequest,
-  ICreatePcesTestRequest,
+  ICreateTemplate,
+  ICreatePcesTest,
   IPcesTemplateResponse,
   IPcesTemplateDetailResponse,
   IPcesTestResponse,
@@ -18,7 +18,8 @@ import {
 } from "../types/pces.types";
 
 export const PcesService = {
-  createTemplate: async (data: ICreateTemplateRequest) => {
+  // Create Template
+  createTemplate: async (data: ICreateTemplate) => {
     if (!data.courseId) {
       throw new ValidationError("courseId is required");
     }
@@ -35,6 +36,7 @@ export const PcesService = {
     return await PcesRepository.createTemplate(data);
   },
 
+  // Get All Templates
   getAllTemplates: async (courseId?: number): Promise<IPcesTemplateResponse[]> => {
     const templates = await PcesRepository.findAllTemplates(courseId);
 
@@ -52,6 +54,7 @@ export const PcesService = {
     }));
   },
 
+  // Get Template Detail
   getTemplateDetail: async (id: number): Promise<IPcesTemplateDetailResponse> => {
     const template = await PcesRepository.findTemplateById(id);
     if (!template) {
@@ -76,6 +79,7 @@ export const PcesService = {
     };
   },
 
+  // Get Lecturer Templates
   getLecturerTemplates: async (
     lecturerId: number,
     courseId?: number
@@ -115,6 +119,7 @@ export const PcesService = {
     }));
   },
 
+  // Get Lecturer Courses
   getLecturerCourses: async (lecturerId: number): Promise<ILecturerCourseResponse[]> => {
     const lecturerCourses = await prisma.lecturerCourse.findMany({
       where: { lecturerId },
@@ -141,6 +146,7 @@ export const PcesService = {
     }));
   },
 
+  // Get Lecturer Classes
   getLecturerClasses: async (
     lecturerId: number,
     courseId: number
@@ -153,6 +159,7 @@ export const PcesService = {
     return await PcesRepository.findClassesWithQuizzesByCourseWithStudentCount(courseId);
   },
 
+  // Get Lecturer Students
   getLecturerStudents: async (
     lecturerId: number,
     classId: number
@@ -165,8 +172,9 @@ export const PcesService = {
     return await PcesRepository.findStudentsByClass(classId);
   },
 
+  // Create PCEs Test
   createPcesTest: async (
-    data: ICreatePcesTestRequest,
+    data: ICreatePcesTest,
     lecturerId: number
   ): Promise<IPcesTestDetailResponse> => {
     const template = await PcesRepository.findTemplateById(data.templateId);
@@ -269,9 +277,10 @@ export const PcesService = {
     };
   },
 
+  // Update PCEs Test
   updatePcesTest: async (
     testId: number,
-    data: ICreatePcesTestRequest,
+    data: ICreatePcesTest,
     lecturerId: number
   ): Promise<IPcesTestDetailResponse> => {
     const test = await PcesRepository.findTestById(testId);
@@ -357,6 +366,7 @@ export const PcesService = {
     };
   },
 
+  // Get Lecturer Tests
   getLecturerTests: async (lecturerId: number): Promise<IPcesTestResponse[]> => {
     const tests = await PcesRepository.findTestsByLecturer(lecturerId);
 
@@ -388,6 +398,7 @@ export const PcesService = {
     }));
   },
 
+  // Get Test Detail
   getTestDetail: async (
     testId: number,
     lecturerId: number
@@ -435,6 +446,7 @@ export const PcesService = {
     };
   },
 
+  // Get Student Results
   getStudentResults: async (
     studentId: number
   ): Promise<IPcesStudentResultResponse[]> => {
@@ -458,6 +470,7 @@ export const PcesService = {
     }));
   },
 
+  // Calculate PCEs Score
   calculatePcesScore: async (testId: number) => {
     const test = await PcesRepository.findTestById(testId);
     if (!test) {

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ClassService } from "../../services/class.service";
 import { ResponseUtils } from "../../utils/response.utils";
-import { ICreateClassRequest, IUpdateClassRequest, IAssignStudentRequest } from "../../types/class.types";
+import { ICreateClass, IUpdateClass, IAssignStudent } from "../../types/class.types";
 
 export const ClassController = {
   // Create new class
@@ -13,7 +13,7 @@ export const ClassController = {
         return ResponseUtils.error(res, "Name and academic year are required", 400);
       }
 
-      const data: ICreateClassRequest = {
+      const data: ICreateClass = {
         name: name.trim(),
         academicYear: academicYear.trim(),
       };
@@ -71,7 +71,7 @@ export const ClassController = {
         return ResponseUtils.error(res, "At least one field (name or academicYear) is required", 400);
       }
 
-      const data: IUpdateClassRequest = {};
+      const data: IUpdateClass = {};
       if (name !== undefined) data.name = name.trim();
       if (academicYear !== undefined) data.academicYear = academicYear.trim();
 
@@ -144,7 +144,7 @@ export const ClassController = {
         return ResponseUtils.error(res, "Valid studentId is required", 400);
       }
 
-      const data: IAssignStudentRequest = {
+      const data: IAssignStudent = {
         studentId: parseInt(studentId),
       };
 

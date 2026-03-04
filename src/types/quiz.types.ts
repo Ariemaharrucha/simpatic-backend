@@ -48,17 +48,17 @@ export interface IQuizAnswer {
   createdAt: Date;
 }
 
-// Request Types
-export interface ICreateQuizRequest {
+// Input Types
+export interface ICreateQuiz {
   courseId: number;
   classId: number;
   title: string;
   description?: string;
   quizType: QuizType;
-  questions: ICreateQuestionRequest[];
+  questions: ICreateQuestion[];
 }
 
-export interface ICreateQuestionRequest {
+export interface ICreateQuestion {
   questionText: string;
   optionA?: string;
   optionB?: string;
@@ -69,16 +69,16 @@ export interface ICreateQuestionRequest {
   orderNumber?: number;
 }
 
-export interface ISubmitQuizRequest {
-  answers: ISubmitAnswerRequest[];
+export interface ISubmitQuiz {
+  answers: ISubmitAnswer[];
 }
 
-export interface ISubmitAnswerRequest {
+export interface ISubmitAnswer {
   questionId: number;
   answerText: string;
 }
 
-export interface IGradeEssayRequest {
+export interface IGradeEssay {
   questionId: number;
   pointsEarned: number;
 }

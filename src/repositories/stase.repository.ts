@@ -1,8 +1,8 @@
 import prisma from "../utils/prisma";
-import { IStaseListQuery, ICreateStaseDTO, IUpdateStaseDTO } from "../types/stase.types";
+import { IStaseListQuery, ICreateStase, IUpdateStase } from "../types/stase.types";
 
 export const StaseRepository = {
-  create: async (data: ICreateStaseDTO) => {
+  create: async (data: ICreateStase) => {
     return await prisma.masterStase.create({
       data: {
         name: data.name,
@@ -70,7 +70,7 @@ export const StaseRepository = {
     return { stases, total };
   },
 
-  update: async (id: number, data: IUpdateStaseDTO) => {
+  update: async (id: number, data: IUpdateStase) => {
     return await prisma.masterStase.update({
       where: { id },
       data: {

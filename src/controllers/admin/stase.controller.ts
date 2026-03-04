@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { StaseService } from "../../services/stase.service";
 import { ResponseUtils } from "../../utils/response.utils";
-import { ICreateStaseDTO, IUpdateStaseDTO, IStaseListQuery } from "../../types/stase.types";
+import { ICreateStase, IUpdateStase, IStaseListQuery } from "../../types/stase.types";
 
 export const StaseController = {
   handleCreateStase: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const data: ICreateStaseDTO = req.body;
-      const stase = await StaseService.create(data);
+      const data: ICreateStase = req.body;
+      const stase = await StaseService.createStase(data);
       return ResponseUtils.success(res, stase, "Stase created successfully", 201);
     } catch (error) {
       next(error);
@@ -18,7 +18,7 @@ export const StaseController = {
     try {
       const { id } = req.params;
       const includeDeleted = req.query.includeDeleted === "true";
-      const stase = await StaseService.getById(Number(id), includeDeleted);
+      const stase = await StaseService.getStaseById(Number(id), includeDeleted);
 
       if (!stase) {
         return ResponseUtils.error(res, "Stase not found", 404);
@@ -39,7 +39,7 @@ export const StaseController = {
         includeDeleted: req.query.includeDeleted === "true",
       };
 
-      const result = await StaseService.getAll(query);
+      const result = await StaseService.getAllStases(query);
       return ResponseUtils.success(res, result, "Stases retrieved successfully");
     } catch (error) {
       next(error);
@@ -49,8 +49,8 @@ export const StaseController = {
   handleUpdateStase: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      const data: IUpdateStaseDTO = req.body;
-      const stase = await StaseService.update(Number(id), data);
+      const data: IUpdateStase = req.body;
+      const stase = await StaseService.updateStase(Number(id), data);
       return ResponseUtils.success(res, stase, "Stase updated successfully");
     } catch (error) {
       next(error);
@@ -60,7 +60,7 @@ export const StaseController = {
   handleDeleteStase: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      await StaseService.delete(Number(id));
+      await StaseService.deleteStase(Number(id));
       return ResponseUtils.success(res, null, "Stase deleted successfully");
     } catch (error) {
       next(error);
@@ -70,7 +70,7 @@ export const StaseController = {
   handleRestoreStase: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      const stase = await StaseService.restore(Number(id));
+      const stase = await StaseService.restoreStase(Number(id));
       return ResponseUtils.success(res, stase, "Stase restored successfully");
     } catch (error) {
       next(error);

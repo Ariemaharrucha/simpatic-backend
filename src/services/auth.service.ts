@@ -19,7 +19,7 @@ import {
 } from "../middleware/error.middleware";
 
 export const AuthService = {
-
+  // Login User
   login: async (identifier: string, password: string): Promise<IAuthResponse> => {
     let user: any = null;
 
@@ -214,6 +214,7 @@ export const AuthService = {
     });
   },
 
+  // Verify OTP
   verifyOTP: async (email: string, otp: string): Promise<{ resetToken: string }> => {
     const user = await UserRepository.findByEmail(email);
 
@@ -265,6 +266,7 @@ export const AuthService = {
     return { resetToken };
   },
 
+  // Reset Password
   resetPassword: async ( email: string, resetToken: string, newPassword: string): Promise<void> => {
     const decoded = JwtUtils.verifyResetToken(resetToken);
 

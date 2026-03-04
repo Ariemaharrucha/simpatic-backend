@@ -5,9 +5,9 @@ import { NotFoundError, ForbiddenError, ValidationError } from "../middleware/er
 import { Prisma } from "../generated/prisma/client";
 import prisma from "../utils/prisma";
 import {
-  ICreateQuizRequest,
-  ICreateQuestionRequest,
-  ISubmitAnswerRequest,
+  ICreateQuiz,
+  ICreateQuestion,
+  ISubmitAnswer,
   IQuizResponse,
   IQuizDetailResponse,
   IQuizSubmissionResponse,
@@ -15,7 +15,8 @@ import {
 } from "../types/quiz.types";
 
 export const QuizService = {
-  createQuiz: async (data: ICreateQuizRequest, lecturerId: number) => {
+  // Create Quiz
+  createQuiz: async (data: ICreateQuiz, lecturerId: number) => {
     const course = await CourseRepository.findById(data.courseId);
     if (!course) {
       throw new NotFoundError("Course not found");
@@ -67,6 +68,7 @@ export const QuizService = {
     });
   },
 
+  // Get Quiz for Lecturer
   getQuizForLecturer: async (quizId: number, lecturerId: number) => {
     const quiz = await QuizRepository.findById(quizId);
 
@@ -106,6 +108,7 @@ export const QuizService = {
     return response;
   },
 
+  // Get Quiz for Student
   getQuizForStudent: async (quizId: number, studentId: number) => {
     const quiz = await QuizRepository.findById(quizId);
 
@@ -153,6 +156,7 @@ export const QuizService = {
     return response;
   },
 
+  // Get Lecturer Quizzes
   getLecturerQuizzes: async (lecturerId: number, page: number, limit: number) => {
     const result = await QuizRepository.findByLecturer(lecturerId, page, limit);
 
@@ -183,6 +187,7 @@ export const QuizService = {
     };
   },
 
+  // Get Available Quizzes
   getAvailableQuizzes: async (studentId: number) => {
     const classWithStudents = await prisma.classStudent.findFirst({
       where: { studentId },
@@ -221,9 +226,10 @@ export const QuizService = {
     return { quizzes: response, total: response.length };
   },
 
+  // Create Question
   createQuestion: async (
     quizId: number,
-    data: ICreateQuestionRequest,
+    data: ICreateQuestion,
     lecturerId: number
   ) => {
     const quiz = await QuizRepository.findById(quizId);
@@ -252,8 +258,9 @@ export const QuizService = {
     return await QuizRepository.createQuestion(quizId, data);
   },
 
+  // Submit Quiz
   submitQuiz: async (
-    data: { quizId: number; answers: ISubmitAnswerRequest[] },
+    data: { quizId: number; answers: ISubmitAnswer[] },
     studentId: number
   ) => {
     const quiz = await QuizRepository.findById(data.quizId);
@@ -330,6 +337,7 @@ export const QuizService = {
     });
   },
 
+  // Grade Essay
   gradeEssay: async (
     submissionId: number,
     questionId: number,
@@ -393,6 +401,7 @@ export const QuizService = {
     }
   },
 
+  // Get Student Results
   getStudentResults: async (studentId: number) => {
     const submissions = await QuizRepository.findSubmissionsByStudent(studentId);
 
@@ -419,6 +428,7 @@ export const QuizService = {
     return results;
   },
 
+  // Get Quiz Statistics
   getQuizStatistics: async (quizId: number, lecturerId: number): Promise<IQuizStatisticsResponse> => {
     const quiz = await QuizRepository.findById(quizId);
 
@@ -454,6 +464,7 @@ export const QuizService = {
     };
   },
 
+  // Get Quiz Submissions
   getQuizSubmissions: async (quizId: number, lecturerId: number) => {
     const quiz = await QuizRepository.findById(quizId);
 
@@ -469,6 +480,7 @@ export const QuizService = {
     return submissions;
   },
 
+  // Get Submission Detail
   getSubmissionDetail: async (submissionId: number, studentId: number) => {
     const submission = await QuizRepository.findSubmissionById(submissionId);
 

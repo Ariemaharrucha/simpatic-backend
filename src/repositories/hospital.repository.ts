@@ -1,8 +1,8 @@
 import prisma from "../utils/prisma";
-import { IHospitalListQuery, ICreateHospitalDTO, IUpdateHospitalDTO } from "../types/hospital.types";
+import { IHospitalListQuery, ICreateHospital, IUpdateHospital } from "../types/hospital.types";
 
 export const HospitalRepository = {
-  create: async (data: ICreateHospitalDTO) => {
+  create: async (data: ICreateHospital) => {
     return await prisma.hospital.create({
       data: {
         name: data.name,
@@ -56,7 +56,7 @@ export const HospitalRepository = {
     return { hospitals, total };
   },
 
-  update: async (id: number, data: IUpdateHospitalDTO) => {
+  update: async (id: number, data: IUpdateHospital) => {
     return await prisma.hospital.update({
       where: { id },
       data: {

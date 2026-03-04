@@ -1,6 +1,6 @@
 import {
-  ICreateHospitalDTO,
-  IUpdateHospitalDTO,
+  ICreateHospital,
+  IUpdateHospital,
   IHospitalResponse,
   IHospitalListQuery,
   IPaginationResponse,
@@ -9,6 +9,7 @@ import { HospitalRepository } from "../repositories/hospital.repository";
 import { ValidationError, NotFoundError, BadRequestError } from "../middleware/error.middleware";
 import { Prisma } from "../generated/prisma/client";
 
+// Hospital 
 const mapToHospitalResponse = (hospital: {
   id: number;
   name: string;
@@ -32,7 +33,8 @@ const mapToHospitalResponse = (hospital: {
 };
 
 export const HospitalService = {
-  create: async (data: ICreateHospitalDTO): Promise<IHospitalResponse> => {
+  // Create New Hospital
+  createHospital: async (data: ICreateHospital): Promise<IHospitalResponse> => {
     const existingHospital = await HospitalRepository.findByName(data.name);
     if (existingHospital) {
       throw new ValidationError("Hospital with this name already exists");
@@ -42,7 +44,8 @@ export const HospitalService = {
     return mapToHospitalResponse(hospital);
   },
 
-  getById: async (id: number, includeDeleted: boolean = false): Promise<IHospitalResponse | null> => {
+  // Get Hospital By ID
+  getHospitalById: async (id: number, includeDeleted: boolean = false): Promise<IHospitalResponse | null> => {
     const hospital = await HospitalRepository.findById(id, includeDeleted);
     if (!hospital) {
       return null;
@@ -50,7 +53,8 @@ export const HospitalService = {
     return mapToHospitalResponse(hospital);
   },
 
-  getAll: async (query: IHospitalListQuery): Promise<{
+  //  Get All Hospital
+  getAllHospitals: async (query: IHospitalListQuery): Promise<{
     hospitals: IHospitalResponse[];
     pagination: IPaginationResponse;
   }> => {
@@ -68,7 +72,8 @@ export const HospitalService = {
     };
   },
 
-  update: async (id: number, data: IUpdateHospitalDTO): Promise<IHospitalResponse> => {
+  // Update Hospital
+  updateHospital: async (id: number, data: IUpdateHospital): Promise<IHospitalResponse> => {
     const existingHospital = await HospitalRepository.findById(id);
     if (!existingHospital) {
       throw new NotFoundError("Hospital not found");
@@ -85,7 +90,8 @@ export const HospitalService = {
     return mapToHospitalResponse(hospital);
   },
 
-  delete: async (id: number): Promise<void> => {
+  // Soft Delete Hospital
+  deleteHospital: async (id: number): Promise<void> => {
     const hospital = await HospitalRepository.findById(id);
     if (!hospital) {
       throw new NotFoundError("Hospital not found");
@@ -98,7 +104,8 @@ export const HospitalService = {
     await HospitalRepository.softDelete(id);
   },
 
-  restore: async (id: number): Promise<IHospitalResponse> => {
+  // Restore Hospital
+  restoreHospital: async (id: number): Promise<IHospitalResponse> => {
     const hospital = await HospitalRepository.findById(id, true);
     if (!hospital) {
       throw new NotFoundError("Hospital not found");
@@ -112,7 +119,8 @@ export const HospitalService = {
     return mapToHospitalResponse(restored);
   },
 
-  validateExists: async (id: number): Promise<{
+  // Validate Hospital Exists
+  validateHospitalExists: async (id: number): Promise<{
     id: number;
     name: string;
     latitude: Prisma.Decimal;

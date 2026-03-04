@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import { HospitalService } from "../../services/hospital.service";
 import { ResponseUtils } from "../../utils/response.utils";
-import { ICreateHospitalDTO, IUpdateHospitalDTO, IHospitalListQuery } from "../../types/hospital.types";
+import { ICreateHospital, IUpdateHospital, IHospitalListQuery } from "../../types/hospital.types";
 
 export const HospitalController = {
   handleCreateHospital: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const data: ICreateHospitalDTO = req.body;
-      const hospital = await HospitalService.create(data);
+      const data: ICreateHospital = req.body;
+      const hospital = await HospitalService.createHospital(data);
       return ResponseUtils.success(res, hospital, "Hospital created successfully", 201);
     } catch (error) {
       next(error);
@@ -18,7 +18,7 @@ export const HospitalController = {
     try {
       const { id } = req.params;
       const includeDeleted = req.query.includeDeleted === "true";
-      const hospital = await HospitalService.getById(Number(id), includeDeleted);
+      const hospital = await HospitalService.getHospitalById(Number(id), includeDeleted);
 
       if (!hospital) {
         return ResponseUtils.error(res, "Hospital not found", 404);
@@ -39,7 +39,7 @@ export const HospitalController = {
         includeDeleted: req.query.includeDeleted === "true",
       };
 
-      const result = await HospitalService.getAll(query);
+      const result = await HospitalService.getAllHospitals(query);
       return ResponseUtils.success(res, result, "Hospitals retrieved successfully");
     } catch (error) {
       next(error);
@@ -49,8 +49,8 @@ export const HospitalController = {
   handleUpdateHospital: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      const data: IUpdateHospitalDTO = req.body;
-      const hospital = await HospitalService.update(Number(id), data);
+      const data: IUpdateHospital = req.body;
+      const hospital = await HospitalService.updateHospital(Number(id), data);
       return ResponseUtils.success(res, hospital, "Hospital updated successfully");
     } catch (error) {
       next(error);
@@ -60,7 +60,7 @@ export const HospitalController = {
   handleDeleteHospital: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      await HospitalService.delete(Number(id));
+      await HospitalService.deleteHospital(Number(id));
       return ResponseUtils.success(res, null, "Hospital deleted successfully");
     } catch (error) {
       next(error);
@@ -70,7 +70,7 @@ export const HospitalController = {
   handleRestoreHospital: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      const hospital = await HospitalService.restore(Number(id));
+      const hospital = await HospitalService.restoreHospital(Number(id));
       return ResponseUtils.success(res, hospital, "Hospital restored successfully");
     } catch (error) {
       next(error);

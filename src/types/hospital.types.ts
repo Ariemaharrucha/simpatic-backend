@@ -9,14 +9,14 @@ export interface IHospitalResponse {
   deletedAt: Date | null;
 }
 
-export interface ICreateHospitalDTO {
+export interface ICreateHospital {
   name: string;
   latitude: number;
   longitude: number;
   radius?: number;
 }
 
-export interface IUpdateHospitalDTO {
+export interface IUpdateHospital {
   name?: string;
   latitude?: number;
   longitude?: number;

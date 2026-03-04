@@ -1,14 +1,14 @@
 import prisma from "../utils/prisma";
 import { Prisma } from "../generated/prisma/client";
 import {
-  ICreateQuizRequest,
-  ICreateQuestionRequest,
+  ICreateQuiz,
+  ICreateQuestion,
   QuizType,
 } from "../types/quiz.types";
 
 export const QuizRepository = {
   createQuiz: async (
-    data: ICreateQuizRequest & { lecturerId: number }
+    data: ICreateQuiz & { lecturerId: number }
   ) => {
     return await prisma.$transaction(async (tx) => {
       const quiz = await tx.quiz.create({
@@ -154,9 +154,9 @@ export const QuizRepository = {
     return quizzes;
   },
 
-  createQuestion: async (
+createQuestion: async (
     quizId: number,
-    data: ICreateQuestionRequest
+    data: ICreateQuestion
   ) => {
     return await prisma.quizQuestion.create({
       data: {

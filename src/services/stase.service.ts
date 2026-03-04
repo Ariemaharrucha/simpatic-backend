@@ -1,6 +1,6 @@
 import {
-  ICreateStaseDTO,
-  IUpdateStaseDTO,
+  ICreateStase,
+  IUpdateStase,
   IMasterStaseResponse,
   IStaseListQuery,
   IPaginationResponse,
@@ -46,7 +46,8 @@ const mapToStaseResponse = (stase: {
 };
 
 export const StaseService = {
-  create: async (data: ICreateStaseDTO): Promise<IMasterStaseResponse> => {
+  // Create Stase
+  createStase: async (data: ICreateStase): Promise<IMasterStaseResponse> => {
     const existingStase = await StaseRepository.findByName(data.name);
     if (existingStase) {
       throw new ValidationError("Stase with this name already exists");
@@ -63,7 +64,8 @@ export const StaseService = {
     return mapToStaseResponse(stase);
   },
 
-  getById: async (id: number, includeDeleted: boolean = false): Promise<IMasterStaseResponse | null> => {
+  // Get Stase by ID
+  getStaseById: async (id: number, includeDeleted: boolean = false): Promise<IMasterStaseResponse | null> => {
     const stase = await StaseRepository.findById(id, includeDeleted);
     if (!stase) {
       return null;
@@ -71,7 +73,8 @@ export const StaseService = {
     return mapToStaseResponse(stase);
   },
 
-  getAll: async (query: IStaseListQuery): Promise<{
+  // Get All Stases
+  getAllStases: async (query: IStaseListQuery): Promise<{
     stases: IMasterStaseResponse[];
     pagination: IPaginationResponse;
   }> => {
@@ -89,7 +92,8 @@ export const StaseService = {
     };
   },
 
-  update: async (id: number, data: IUpdateStaseDTO): Promise<IMasterStaseResponse> => {
+  // Update Stase
+  updateStase: async (id: number, data: IUpdateStase): Promise<IMasterStaseResponse> => {
     const existingStase = await StaseRepository.findById(id);
     if (!existingStase) {
       throw new NotFoundError("Stase not found");
@@ -106,7 +110,8 @@ export const StaseService = {
     return mapToStaseResponse(stase);
   },
 
-  delete: async (id: number): Promise<void> => {
+  // Soft Delete Stase
+  deleteStase: async (id: number): Promise<void> => {
     const stase = await StaseRepository.findById(id);
     if (!stase) {
       throw new NotFoundError("Stase not found");
@@ -119,7 +124,8 @@ export const StaseService = {
     await StaseRepository.softDelete(id);
   },
 
-  restore: async (id: number): Promise<IMasterStaseResponse> => {
+  // Restore Stase
+  restoreStase: async (id: number): Promise<IMasterStaseResponse> => {
     const stase = await StaseRepository.findById(id, true);
     if (!stase) {
       throw new NotFoundError("Stase not found");
@@ -133,7 +139,8 @@ export const StaseService = {
     return mapToStaseResponse(restored);
   },
 
-  validateExists: async (id: number): Promise<{
+  // Validate Stase Exists
+  validateStaseExists: async (id: number): Promise<{
     id: number;
     name: string;
     defaultHospitalId: number | null;

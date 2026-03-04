@@ -1,10 +1,10 @@
 import { CourseRepository } from "../repositories/course.repository";
 import {
   ICourseResponse,
-  ICreateCourseRequest,
-  IUpdateCourseRequest,
+  ICreateCourse,
+  IUpdateCourse,
   ICourseWithLecturers,
-  IAssignLecturerRequest,
+  IAssignLecturer,
   IAvailableLecturer,
   ICourseLecturer,
   ILecturerWithUser,
@@ -14,7 +14,7 @@ import { ValidationError, NotFoundError } from "../middleware/error.middleware";
 
 export const CourseService = {
   // Create new course
-  createCourse: async (data: ICreateCourseRequest): Promise<ICourseResponse> => {
+  createCourse: async (data: ICreateCourse): Promise<ICourseResponse> => {
     if (!data.code || data.code.trim().length === 0) {
       throw new ValidationError("Course code is required");
     }
@@ -56,7 +56,7 @@ export const CourseService = {
   },
 
   // Update course
-  updateCourse: async (id: number, data: IUpdateCourseRequest): Promise<ICourseResponse> => {
+  updateCourse: async (id: number, data: IUpdateCourse): Promise<ICourseResponse> => {
     const exists = await CourseRepository.exists(id);
     if (!exists) {
       throw new NotFoundError("Course not found");
@@ -104,7 +104,7 @@ export const CourseService = {
   },
 
   // Assign lecturer to course
-  assignLecturer: async (courseId: number, data: IAssignLecturerRequest): Promise<any> => {
+  assignLecturer: async (courseId: number, data: IAssignLecturer): Promise<any> => {
     const { lecturerId } = data;
 
     // Check if course exists and is active

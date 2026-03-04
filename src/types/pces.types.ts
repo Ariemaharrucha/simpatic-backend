@@ -38,27 +38,27 @@ export interface IPcesScore {
   createdAt: Date;
 }
 
-export interface ICreateTemplateRequest {
+export interface ICreateTemplate {
   courseId: number;
   name: string;
   description?: string;
-  sopItems: ICreateSopItemRequest[];
+  sopItems: ICreateSopItem[];
 }
 
-export interface ICreateSopItemRequest {
+export interface ICreateSopItem {
   sopDescription: string;
   orderNumber?: number;
 }
 
-export interface ICreatePcesTestRequest {
+export interface ICreatePcesTest {
   templateId: number;
   classId: number;
   studentId: number;
   testDate: string;
-  scores: ICreatePcesScoreRequest[];
+  scores: ICreatePcesScore[];
 }
 
-export interface ICreatePcesScoreRequest {
+export interface ICreatePcesScore {
   sopItemId: number;
   score: number;
 }

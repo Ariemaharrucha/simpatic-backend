@@ -18,7 +18,7 @@ export interface IMasterStaseResponse {
   deletedAt: Date | null;
 }
 
-export interface ICreateStaseDTO {
+export interface ICreateStase {
   name: string;
   defaultHospitalId?: number;
   templateFolder?: string;
@@ -30,7 +30,7 @@ export interface ICreateStaseDTO {
   hasAttitude?: boolean;
 }
 
-export interface IUpdateStaseDTO {
+export interface IUpdateStase {
   name?: string;
   defaultHospitalId?: number | null;
   templateFolder?: string;

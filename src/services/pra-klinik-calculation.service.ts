@@ -43,6 +43,7 @@ export interface IPraKlinikReport {
 }
 
 export const PraKlinikCalculationService = {
+  // Calculate Pra Klinik Score
   calculatePraKlinikScore: async (studentId: number): Promise<IPraKlinikScore> => {
     const quizSubmissions = await QuizRepository.findSubmissionsByStudent(studentId);
     const gradedQuizzes = quizSubmissions.filter((s) => s.isGraded && s.score !== null);
@@ -77,6 +78,7 @@ export const PraKlinikCalculationService = {
     };
   },
 
+  // Check Pra Klinik Pass Status
   checkPraKlinikPassStatus: async (studentId: number) => {
     const { quizScore, pcesScore, totalScore, quizCount, pcesCount } = await PraKlinikCalculationService.calculatePraKlinikScore(studentId);
 
@@ -97,6 +99,7 @@ export const PraKlinikCalculationService = {
     };
   },
 
+  // Get Pra Klinik Report
   getPraKlinikReport: async (studentId: number): Promise<IPraKlinikReport> => {
     const quizSubmissions = await QuizRepository.findSubmissionsByStudent(studentId);
     const pcesTests = await PcesRepository.findTestsByStudent(studentId);

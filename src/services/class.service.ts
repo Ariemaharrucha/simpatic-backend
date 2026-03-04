@@ -2,10 +2,10 @@ import { ClassRepository } from "../repositories/class.repository";
 import { UserRepository } from "../repositories/user.repository";
 import { 
   IClassResponse, 
-  ICreateClassRequest, 
-  IUpdateClassRequest, 
+  ICreateClass, 
+  IUpdateClass, 
   IClassWithStudents,
-  IAssignStudentRequest,
+  IAssignStudent,
   IAvailableStudent,
   IPaginationResponse
 } from "../types/class.types";
@@ -13,7 +13,7 @@ import { ValidationError, NotFoundError } from "../middleware/error.middleware";
 
 export const ClassService = {
   // Create new class
-  createClass: async (data: ICreateClassRequest): Promise<IClassResponse> => {
+  createClass: async (data: ICreateClass): Promise<IClassResponse> => {
     // Validate academic year format (2025/2026)
     const academicYearPattern = /^\d{4}\/\d{4}$/;
     if (!academicYearPattern.test(data.academicYear)) {
@@ -62,7 +62,7 @@ export const ClassService = {
   },
 
   // Update class
-  updateClass: async (id: number, data: IUpdateClassRequest): Promise<IClassResponse> => {
+  updateClass: async (id: number, data: IUpdateClass): Promise<IClassResponse> => {
     // Check if class exists
     const exists = await ClassRepository.exists(id);
     if (!exists) {
@@ -108,7 +108,7 @@ export const ClassService = {
   },
 
   // Assign student to class
-  assignStudent: async (classId: number, data: IAssignStudentRequest): Promise<any> => {
+  assignStudent: async (classId: number, data: IAssignStudent): Promise<any> => {
     const { studentId } = data;
 
     // Check if student exists

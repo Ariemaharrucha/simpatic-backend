@@ -1,9 +1,9 @@
 import prisma from "../utils/prisma";
-import { IClassResponse, ICreateClassRequest, IUpdateClassRequest, IClassWithStudents, IAvailableStudent, IPaginationResponse } from "../types/class.types";
+import { IClassResponse, ICreateClass, IUpdateClass, IClassWithStudents, IAvailableStudent, IPaginationResponse } from "../types/class.types";
 
 export const ClassRepository = {
   // Create new class
-  create: async (data: ICreateClassRequest): Promise<IClassResponse> => {
+  create: async (data: ICreateClass): Promise<IClassResponse> => {
     return await prisma.class.create({
       data: {
         name: data.name,
@@ -122,7 +122,7 @@ export const ClassRepository = {
   },
 
   // Update class
-  update: async (id: number, data: IUpdateClassRequest): Promise<IClassResponse> => {
+  update: async (id: number, data: IUpdateClass): Promise<IClassResponse> => {
     return await prisma.class.update({
       where: { id },
       data: {

@@ -15,12 +15,12 @@ export interface IPaginationResponse {
   totalPages: number;
 }
 
-export interface ICreateCourseRequest {
+export interface ICreateCourse {
   code: string;
   name: string;
 }
 
-export interface IUpdateCourseRequest {
+export interface IUpdateCourse {
   code?: string;
   name?: string;
 }
@@ -49,7 +49,7 @@ export interface ILecturerCourse {
   createdAt: Date;
 }
 
-export interface IAssignLecturerRequest {
+export interface IAssignLecturer {
   lecturerId: number;
 }
 

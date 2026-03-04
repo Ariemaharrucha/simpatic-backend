@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { CourseService } from "../../services/course.service";
 import { ResponseUtils } from "../../utils/response.utils";
-import { ICreateCourseRequest, IUpdateCourseRequest, IAssignLecturerRequest } from "../../types/course.types";
+import { ICreateCourse, IUpdateCourse, IAssignLecturer } from "../../types/course.types";
 
 export const CourseController = {
   // Create new course
@@ -13,7 +13,7 @@ export const CourseController = {
         return ResponseUtils.error(res, "Code and name are required", 400);
       }
 
-      const data: ICreateCourseRequest = {
+      const data: ICreateCourse = {
         code: code.trim(),
         name: name.trim(),
       };
@@ -70,7 +70,7 @@ export const CourseController = {
         return ResponseUtils.error(res, "At least one field (code or name) is required", 400);
       }
 
-      const data: IUpdateCourseRequest = {};
+      const data: IUpdateCourse = {};
       if (code !== undefined) data.code = code.trim();
       if (name !== undefined) data.name = name.trim();
 
@@ -143,7 +143,7 @@ export const CourseController = {
         return ResponseUtils.error(res, "Valid lecturerId is required", 400);
       }
 
-      const data: IAssignLecturerRequest = {
+      const data: IAssignLecturer = {
         lecturerId: parseInt(lecturerId),
       };
 

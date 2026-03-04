@@ -15,12 +15,12 @@ export interface IPaginationResponse {
   totalPages: number;
 }
 
-export interface ICreateClassRequest {
+export interface ICreateClass {
   name: string;
   academicYear: string;
 }
 
-export interface IUpdateClassRequest {
+export interface IUpdateClass {
   name?: string;
   academicYear?: string;
 }
@@ -42,7 +42,7 @@ export interface IClassWithStudents extends IClassResponse {
   }>;
 }
 
-export interface IAssignStudentRequest {
+export interface IAssignStudent {
   studentId: number;
 }
 

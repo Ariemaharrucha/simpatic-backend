@@ -1,9 +1,9 @@
 import prisma from "../utils/prisma";
-import { ICourseResponse, ICreateCourseRequest, IUpdateCourseRequest, ICourseWithLecturers, IAvailableLecturer, ILecturerWithUser, IPaginationResponse } from "../types/course.types";
+import { ICourseResponse, ICreateCourse, IUpdateCourse, ICourseWithLecturers, IAvailableLecturer, ILecturerWithUser, IPaginationResponse } from "../types/course.types";
 
 export const CourseRepository = {
   // Create new course
-  create: async (data: ICreateCourseRequest): Promise<ICourseResponse> => {
+  create: async (data: ICreateCourse): Promise<ICourseResponse> => {
     return await prisma.course.create({
       data: {
         code: data.code,
@@ -118,7 +118,7 @@ export const CourseRepository = {
   },
 
   // Update course
-  update: async (id: number, data: IUpdateCourseRequest): Promise<ICourseResponse> => {
+  update: async (id: number, data: IUpdateCourse): Promise<ICourseResponse> => {
     return await prisma.course.update({
       where: { id },
       data: {
