@@ -149,11 +149,7 @@ export const AuthService = {
   },
 
   // Change password
-  changePassword: async (
-    userId: number,
-    oldPassword: string,
-    newPassword: string,
-  ): Promise<void> => {
+  changePassword: async (userId: number, oldPassword: string, newPassword: string): Promise<void> => {
     const user = await UserRepository.findById(userId);
 
     if (!user) {

@@ -35,13 +35,6 @@ export interface IClassWithStudents extends IClass {
   }>;
 }
 
-export interface IClassStudent {
-  id: number;
-  classId: number;
-  studentId: number;
-  createdAt: Date;
-}
-
 export interface IAssignStudentRequest {
   studentId: number;
 }

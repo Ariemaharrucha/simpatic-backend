@@ -36,9 +36,3 @@ export interface IPaginationResponse {
   total: number;
   totalPages: number;
 }
-
-export interface IAttendanceValidation {
-  studentLatitude: number;
-  studentLongitude: number;
-  hospitalId: number;
-}
