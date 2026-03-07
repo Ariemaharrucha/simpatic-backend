@@ -1,20 +1,38 @@
 import { Router } from "express";
 import { ClassController } from "../../controllers/admin/class.controller";
 
-const router = Router();
+export const classesRoutes = Router();
 
-// CRUD Routes
-router.post("/", ClassController.handleCreateClass);
-router.get("/", ClassController.handleGetAllClasses);
-router.get("/available-students", ClassController.handleGetAvailableStudents);
-router.get("/:id", ClassController.handleGetClassById);
-router.put("/:id", ClassController.handleUpdateClass);
-router.delete("/:id", ClassController.handleDeleteClass);
-router.patch("/:id/restore", ClassController.handleRestoreClass);
+// CLASS CRUD OPERATIONS
 
-// Student plotting routes
-router.get("/:id/students", ClassController.handleGetStudents);
-router.post("/:id/students", ClassController.handleAssignStudent);
-router.delete("/:id/students/:studentId", ClassController.handleRemoveStudent);
+// Create new class (requires unique name + academicYear combination)
+classesRoutes.post("/", ClassController.handleCreateClass);
 
-export default router;
+// Get all classes with pagination (supports ?page=1&limit=10&academicYear=2025/2026&includeInactive=true)
+classesRoutes.get("/", ClassController.handleGetAllClasses);
+
+// Get students not assigned to any class (for assignment), filter by academicYear)
+classesRoutes.get("/available-students", ClassController.handleGetAvailableStudents);
+
+// Get single class by ID
+classesRoutes.get("/:id", ClassController.handleGetClassById);
+
+// Update class details (name, academicYear)
+classesRoutes.put("/:id", ClassController.handleUpdateClass);
+
+// Soft delete class (mark as inactive, can be restored)
+classesRoutes.delete("/:id", ClassController.handleDeleteClass);
+
+// Restore soft-deleted class
+classesRoutes.patch("/:id/restore", ClassController.handleRestoreClass);
+
+// STUDENT PLOTTING (Assign students to class)
+
+// Get all students assigned to a specific class
+classesRoutes.get("/:id/students", ClassController.handleGetStudents);
+
+// Assign student to class (validates student exists and not already in class for same year)
+classesRoutes.post("/:id/students", ClassController.handleAssignStudent);
+
+// Remove student from class
+classesRoutes.delete("/:id/students/:studentId", ClassController.handleRemoveStudent);

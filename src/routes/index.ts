@@ -1,15 +1,15 @@
 import { Router } from "express";
-import authRoutes from "./auth.routes";
-import adminRoutes from "./admin.routes";
-import classesRoutes from "./admin/classes.routes";
-import coursesRoutes from "./admin/courses.routes";
-import praKlinikRoutes from "./admin/pra-klinik.routes";
-import hospitalRoutes from "./admin/hospital.routes";
-import staseRoutes from "./admin/stase.routes";
-import quizRoutes from "./pra-klinik/quiz.routes";
-import pcesRoutes from "./pra-klinik/pces.routes";
 import { authenticate } from "../middleware/auth.middleware";
 import { authorize } from "../middleware/role.middleware";
+import { authRoutes } from "./auth.routes";
+import { adminRoutes } from "./admin.routes";
+import { classesRoutes } from "./admin/classes.routes";
+import { coursesRoutes } from "./admin/courses.routes";
+import { praKlinikRoutes } from "./admin/pra-klinik.routes";
+import { hospitalRoutes } from "./admin/hospital.routes";
+import { staseRoutes } from "./admin/stase.routes";
+import { quizRoutes } from "./pra-klinik/quiz.routes";
+import { pcesRoutes } from "./pra-klinik/pces.routes";
 
 const router = Router();
 

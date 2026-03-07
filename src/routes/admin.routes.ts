@@ -3,24 +3,37 @@ import { AdminController } from "../controllers/admin.controller";
 import { authenticate } from "../middleware/auth.middleware";
 import { authorize } from "../middleware/role.middleware";
 
-const router = Router();
+export const adminRoutes = Router();
 
-router.use(authenticate);
-router.use(authorize("admin"));
+// Apply authentication and admin authorization to all routes
+adminRoutes.use(authenticate);
+adminRoutes.use(authorize("admin"));
 
-// Student routes
-router.post("/users/students", AdminController.handleRegisterStudent);
-router.get("/users/students", AdminController.getAllStudents);
+// STUDENT MANAGEMENT
 
-// Lecturer routes
-router.post("/users/lecturers", AdminController.handleRegisterLecturer);
-router.get("/users/lecturers", AdminController.getAllLecturers);
+// Register new student (generates user account, sends credentials via email)
+adminRoutes.post("/users/students", AdminController.handleRegisterStudent);
 
-// Admin routes
-router.post("/users/admins", AdminController.handleRegisterAdmin);
-router.get("/users/admins", AdminController.getAllAdmins);
+// Get all students with pagination (supports ?page=1&limit=10)
+adminRoutes.get("/users/students", AdminController.getAllStudents);
 
-// Resend credentials
-router.post("/users/:userId/resend-credentials", AdminController.handleResendCredentials);
+// LECTURER MANAGEMENT
 
-export default router;
+// Register new lecturer (generates user account with NIK/lecturerCode, sends credentials via email)
+adminRoutes.post("/users/lecturers", AdminController.handleRegisterLecturer);
+
+// Get all lecturers with pagination (supports ?page=1&limit=10)
+adminRoutes.get("/users/lecturers", AdminController.getAllLecturers);
+
+// ADMIN MANAGEMENT
+
+// Register new admin (generates user account, sends credentials via email)
+adminRoutes.post("/users/admins", AdminController.handleRegisterAdmin);
+
+// Get all admins with pagination (supports ?page=1&limit=10)
+adminRoutes.get("/users/admins", AdminController.getAllAdmins);
+
+// CREDENTIALS MANAGEMENT
+
+// Resend login credentials (generates new password and sends via email)
+adminRoutes.post("/users/:userId/resend-credentials", AdminController.handleResendCredentials);

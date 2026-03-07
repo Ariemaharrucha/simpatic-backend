@@ -3,33 +3,46 @@ import { QuizController } from "../../controllers/pra-klinik/quiz.controller";
 import { authenticate } from "../../middleware/auth.middleware";
 import { authorize } from "../../middleware/role.middleware";
 
-const router = Router();
+export const quizRoutes = Router();
 
-// Student routes - MUST be before /:id to avoid conflict
-router.get("/available", authenticate, authorize("student"), QuizController.handleGetAvailableQuizzes);
+// STATIC PATHS (no parameters)
 
-router.get("/my-results", authenticate, authorize("student"), QuizController.handleGetMyResults);
+// Student: Get quizzes available for student (from enrolled class, not yet submitted)
+quizRoutes.get("/available", authenticate, authorize("student"), QuizController.handleGetAvailableQuizzes); // student
 
-// Lecturer routes
-router.post("/", authenticate, authorize("lecturer"), QuizController.handleCreateQuiz);
+// Student: Get student's own quiz results/submissions
+quizRoutes.get("/my-results", authenticate, authorize("student"), QuizController.handleGetMyResults); // student
 
-router.get("/lecturer", authenticate, authorize("lecturer"), QuizController.handleGetLecturerQuizzes);
+// Lecturer: Get all quizzes created by this lecturer
+quizRoutes.get("/lecturer", authenticate, authorize("lecturer"), QuizController.handleGetLecturerQuizzes); // lecturer
 
-router.get("/:id", authenticate, authorize("lecturer"), QuizController.handleGetQuizDetail);
+// Lecturer: Create new quiz (requires: courseId, classId, title, quizType, questions[])
+quizRoutes.post("/", authenticate, authorize("lecturer"), QuizController.handleCreateQuiz); // lecturer
 
-router.get("/:id/submissions", authenticate, authorize("lecturer"), QuizController.handleGetQuizSubmissions);
+// SPECIFIC PARAMETERIZED PATHS 
 
-router.post("/:id/questions", authenticate, authorize("lecturer"), QuizController.handleCreateQuestion);
+// Student: Get submission detail (MUST be before /:id to avoid being captured by :id wildcard)
+quizRoutes.get("/submissions/:id", authenticate, authorize("student"), QuizController.handleGetSubmissionDetail); // student
 
-router.post("/:id/submissions/:submissionId/grade", authenticate, authorize("lecturer"), QuizController.handleGradeEssay);
+// Lecturer: Get all submissions for a specific quiz
+quizRoutes.get("/:id/submissions", authenticate, authorize("lecturer"), QuizController.handleGetQuizSubmissions); // lecturer
 
-router.get("/:id/statistics", authenticate, authorize("lecturer"), QuizController.handleGetStatistics);
+// Lecturer: Add question to existing quiz
+quizRoutes.post("/:id/questions", authenticate, authorize("lecturer"), QuizController.handleCreateQuestion); // lecturer
 
-// Student routes with params
-router.get("/:id/take", authenticate, authorize("student"), QuizController.handleGetQuizForTaking);
+// Lecturer: Grade essay answer (for essay-type quizzes only)
+quizRoutes.post("/:id/submissions/:submissionId/grade", authenticate, authorize("lecturer"), QuizController.handleGradeEssay); // lecturer
 
-router.post("/:id/submit", authenticate, authorize("student"), QuizController.handleSubmitQuiz);
+// Lecturer: Get quiz statistics (avgScore, minScore, maxScore, totalSubmissions)
+quizRoutes.get("/:id/statistics", authenticate, authorize("lecturer"), QuizController.handleGetStatistics); // lecturer
 
-router.get("/submissions/:id", authenticate, authorize("student"), QuizController.handleGetSubmissionDetail);
+// Student: Get quiz for student to take (hides correct answers, includes questions)
+quizRoutes.get("/:id/take", authenticate, authorize("student"), QuizController.handleGetQuizForTaking); // student
 
-export default router;
+// Student: Submit quiz answers (validates all questions answered, auto-grades multiple choice)
+quizRoutes.post("/:id/submit", authenticate, authorize("student"), QuizController.handleSubmitQuiz); // student
+
+// GENERIC PARAMETERIZED PATHS
+
+// Lecturer: Get quiz detail including correct answers (lecturer only)
+quizRoutes.get("/:id", authenticate, authorize("lecturer"), QuizController.handleGetQuizDetail); // lecturer
